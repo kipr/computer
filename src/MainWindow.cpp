@@ -7,6 +7,8 @@
 #include <kiss-compiler/Temporary.h>
 #include <kiss-compiler/CompilerManager.h>
 
+#include "QUserInfo.h"
+
 using namespace EasyDevice;
 
 MainWindow::MainWindow(QWidget *parent)
@@ -20,17 +22,24 @@ MainWindow::MainWindow(QWidget *parent)
 	
 	DeviceInfo deviceInfo;
 	deviceInfo.setDeviceType("computer");
-	deviceInfo.setDisplayName("beta's comp");
+	deviceInfo.setDisplayName(QUserInfo::username() + "'s Computer");
 	deviceInfo.setSerialNumber("N/A");
 	
 	m_discovery.setDeviceInfo(deviceInfo);
 	
+	bool success = true;
+	
 	if(!m_discovery.setup()) {
 		qDebug() << "Failed to setup ohaiyo listener";
+		success &= false;
 	}
 	if(!m_server.listen(QHostAddress::Any, 8075)) {
 		qDebug() << "Failed to listen";
+		success &= false;
 	}
+	
+	if(success) ui->statusbar->showMessage(QString("Listening for connections on port %1").arg(8075), 0);
+	else ui->statusbar->showMessage("Error listening for incoming connections", 0);
 }
 
 MainWindow::~MainWindow()

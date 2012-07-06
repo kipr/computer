@@ -22,7 +22,11 @@
      <number>12</number>
     </property>
     <item>
-     <widget class="ConsoleWidget" name="console"/>
+     <widget class="ConsoleWidget" name="console">
+      <property name="styleSheet">
+       <string notr="true">font: 14pt &quot;Courier New&quot;;</string>
+      </property>
+     </widget>
     </item>
    </layout>
   </widget>
