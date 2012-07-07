@@ -7,6 +7,7 @@
 #include <kiss-compiler/Temporary.h>
 #include <kiss-compiler/CompilerManager.h>
 
+#include "Computer.h"
 #include "QUserInfo.h"
 
 using namespace EasyDevice;
@@ -24,6 +25,16 @@ MainWindow::MainWindow(QWidget *parent)
 	deviceInfo.setDeviceType("computer");
 	deviceInfo.setDisplayName(QUserInfo::username() + "'s Computer");
 	deviceInfo.setSerialNumber("N/A");
+
+    QString version = (QString::number(COMPUTER_VERSION_MAJOR) + "." + QString::number(COMPUTER_VERSION_MINOR));
+    #if defined(Q_OS_WIN)
+    version += " (for Windows)";
+    #elif defined(Q_OS_MAC)
+    version += " (for Mac)";
+    #else
+    version += " (for Linux)";
+    #endif
+    deviceInfo.setVersion(version);
 	
 	m_discovery.setDeviceInfo(deviceInfo);
 	
