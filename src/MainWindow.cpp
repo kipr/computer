@@ -26,22 +26,22 @@ MainWindow::MainWindow(QWidget *parent)
 	deviceInfo.setDisplayName(QUserInfo::username() + "'s Computer");
 	deviceInfo.setSerialNumber("N/A");
 
-    QString version = (QString::number(COMPUTER_VERSION_MAJOR) + "." + QString::number(COMPUTER_VERSION_MINOR));
-    #if defined(Q_OS_WIN)
-    version += " for Windows";
-    #elif defined(Q_OS_MAC)
-    version += " for Mac OS X";
-    #else
-    version += " for *nix";
-    #endif
-    deviceInfo.setVersion(version);
+	QString version = (QString::number(COMPUTER_VERSION_MAJOR) + "." + QString::number(COMPUTER_VERSION_MINOR));
+	#if defined(Q_OS_WIN)
+	version += " for Windows";
+	#elif defined(Q_OS_MAC)
+	version += " for Mac OS X";
+	#else
+	version += " for *nix";
+	#endif
+	deviceInfo.setVersion(version);
 	
 	m_discovery.setDeviceInfo(deviceInfo);
 	
 	bool success = true;
 	
 	if(!m_discovery.setup()) {
-		qDebug() << "Failed to setup ohaiyo listener";
+		qDebug() << "Failed to setup listener";
 		success &= false;
 	}
 	if(!m_server.listen(QHostAddress::Any, 8075)) {
