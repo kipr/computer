@@ -28,11 +28,11 @@ MainWindow::MainWindow(QWidget *parent)
 
     QString version = (QString::number(COMPUTER_VERSION_MAJOR) + "." + QString::number(COMPUTER_VERSION_MINOR));
     #if defined(Q_OS_WIN)
-    version += " (for Windows)";
+    version += " for Windows";
     #elif defined(Q_OS_MAC)
-    version += " (for Mac)";
+    version += " for Mac OS X";
     #else
-    version += " (for Linux)";
+    version += " for *nix";
     #endif
     deviceInfo.setVersion(version);
 	
