@@ -2,6 +2,7 @@
 #define _MAINWINDOW_H_
 
 #include <QMainWindow>
+#include <QPrinter>
 
 #include <easydevice/Server.h>
 #include <easydevice/DiscoveryClient.h>
@@ -27,10 +28,16 @@ public:
 	CompilationPtr compile(const QString& name);
 	const bool download(const QString& name, TinyArchive *archive);
 	EasyDevice::Filesystem *filesystem();
+
+public slots:
+	void print();
+	void saveToFile();
 	
 private:
 	void killProcess();
 	
+	QPrinter m_printer;
+
 	EasyDevice::Server m_server;
 	EasyDevice::DiscoveryClient m_discovery;
 	

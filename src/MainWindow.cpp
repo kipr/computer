@@ -9,6 +9,9 @@
 
 #include "Computer.h"
 #include "QUserInfo.h"
+#include <QPrintDialog>
+#include <QFileDialog>
+#include <QMessageBox>
 
 using namespace EasyDevice;
 
@@ -51,6 +54,12 @@ MainWindow::MainWindow(QWidget *parent)
 	
 	if(success) ui->statusbar->showMessage(QString("Listening for connections on port %1").arg(8075), 0);
 	else ui->statusbar->showMessage("Error listening for incoming connections", 0);
+
+	ui->menuFile->addAction(ui->actionPrint);
+	ui->menuFile->addAction(ui->actionSave);
+
+	connect(ui->actionPrint, SIGNAL(activated()), this, SLOT(print()));
+	connect(ui->actionSave, SIGNAL(activated()), this, SLOT(saveToFile()));
 }
 
 MainWindow::~MainWindow()
@@ -114,6 +123,32 @@ const bool MainWindow::download(const QString& name, TinyArchive *archive)
 Filesystem *MainWindow::filesystem()
 {
 	return &m_filesystem;
+}
+
+void MainWindow::print()
+{
+	QPrintDialog *printDialog = new QPrintDialog(&m_printer, this);
+	printDialog->setWindowTitle(tr("Print"));
+	if (printDialog->exec() != QDialog::Accepted)
+		return;
+	ui->console->print(&m_printer);
+}
+
+void MainWindow::saveToFile()
+{
+	QString fileName = QFileDialog::getSaveFileName(this, tr("Save"), QString(), tr("Text files (*.txt);;All files (*)"));
+	if(fileName.isEmpty())
+		return;
+	
+	QFile file(fileName);
+	if(!file.open(QFile::WriteOnly | QFile::Text))
+	{
+		QMessageBox::warning(this, tr("Error"), tr("Cannot write to file %1:\n%2.").arg(fileName).arg(file.errorString()));
+		return;
+	}
+
+	QTextStream out(&file);
+	out << ui->console->toPlainText();
 }
 
 void MainWindow::killProcess()
