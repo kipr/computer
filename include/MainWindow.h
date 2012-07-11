@@ -32,6 +32,7 @@ public:
 public slots:
 	void print();
 	void saveToFile();
+	void about();
 	
 private:
 	void killProcess();

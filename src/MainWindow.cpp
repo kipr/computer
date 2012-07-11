@@ -60,6 +60,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 	connect(ui->actionPrint, SIGNAL(activated()), this, SLOT(print()));
 	connect(ui->actionSave, SIGNAL(activated()), this, SLOT(saveToFile()));
+	connect(ui->actionAbout, SIGNAL(activated()), this, SLOT(about()));
 }
 
 MainWindow::~MainWindow()
@@ -149,6 +150,15 @@ void MainWindow::saveToFile()
 
 	QTextStream out(&file);
 	out << ui->console->toPlainText();
+}
+
+void MainWindow::about()
+{
+	QString aboutMessage;
+	aboutMessage += "Copyright (C) 2012 KISS Institute for Practical Robotics\n\n";
+	aboutMessage += "Developed by Braden McDorman and Nafis Zaman\n\n";
+	aboutMessage += "Version " + QString::number(COMPUTER_VERSION_MAJOR) + "." + QString::number(COMPUTER_VERSION_MINOR);
+	QMessageBox::about(this, "About Computer", aboutMessage);
 }
 
 void MainWindow::killProcess()
