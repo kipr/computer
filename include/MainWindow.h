@@ -10,6 +10,8 @@
 #include <easydevice/Filesystem.h>
 #include <kiss-compiler/Compilation.h>
 
+#include "SettingsDialog.h"
+
 namespace Ui
 {
 	class MainWindow;
@@ -33,9 +35,12 @@ public slots:
 	void print();
 	void saveToFile();
 	void about();
+	void settings();
 	
 private:
 	void killProcess();
+	void updateSettings();
+	QString displayName();
 	
 	QPrinter m_printer;
 
@@ -46,6 +51,8 @@ private:
 	QMap<QString, QStringList> m_compileResults;
 	
 	QDir m_workingDirectory;
+
+	SettingsDialog m_settingsDialog;
 	
 	QProcess *m_process;
 	Ui::MainWindow *ui;

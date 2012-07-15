@@ -12,6 +12,8 @@
 #include <QPrintDialog>
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QSettings>
+#include <QDebug>
 
 using namespace EasyDevice;
 
@@ -26,7 +28,7 @@ MainWindow::MainWindow(QWidget *parent)
 	
 	DeviceInfo deviceInfo;
 	deviceInfo.setDeviceType("computer");
-	deviceInfo.setDisplayName(QUserInfo::username() + "'s Computer");
+	deviceInfo.setDisplayName(displayName());
 	deviceInfo.setSerialNumber("N/A");
 
 	QString version = (QString::number(COMPUTER_VERSION_MAJOR) + "." + QString::number(COMPUTER_VERSION_MINOR));
@@ -42,7 +44,6 @@ MainWindow::MainWindow(QWidget *parent)
 	m_discovery.setDeviceInfo(deviceInfo);
 	
 	bool success = true;
-	
 	if(!m_discovery.setup()) {
 		qDebug() << "Failed to setup listener";
 		success &= false;
@@ -61,6 +62,7 @@ MainWindow::MainWindow(QWidget *parent)
 	connect(ui->actionPrint, SIGNAL(activated()), this, SLOT(print()));
 	connect(ui->actionSave, SIGNAL(activated()), this, SLOT(saveToFile()));
 	connect(ui->actionAbout, SIGNAL(activated()), this, SLOT(about()));
+	connect(ui->actionSettings, SIGNAL(activated()), this, SLOT(settings()));
 }
 
 MainWindow::~MainWindow()
@@ -161,6 +163,11 @@ void MainWindow::about()
 	QMessageBox::about(this, "About Computer", aboutMessage);
 }
 
+void MainWindow::settings()
+{
+	if(m_settingsDialog.exec()) updateSettings();
+}
+
 void MainWindow::killProcess()
 {
 	if(!m_process) return;
@@ -169,4 +176,28 @@ void MainWindow::killProcess()
 	ui->console->setProcess(0);
 	delete m_process;
 	m_process = 0;
+}
+
+void MainWindow::updateSettings()
+{
+	DeviceInfo deviceInfo = m_discovery.deviceInfo();
+	deviceInfo.setDisplayName(displayName());
+	m_discovery.setDeviceInfo(deviceInfo);
+}
+
+QString MainWindow::displayName()
+{
+	QString ret;
+	
+	QSettings settings;
+	settings.beginGroup(KISS_CONNECTION);
+	settings.beginGroup(DISPLAY_NAME);
+	if(settings.value(DEFAULT).toBool())
+		ret = QUserInfo::username();
+	else
+		ret = settings.value(CUSTOM_NAME).toString();
+	settings.endGroup();
+	settings.endGroup();
+	
+	return ret;
 }
