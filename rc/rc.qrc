@@ -1,8 +1,10 @@
 <RCC>
-  <qresource prefix="/">
-    <file>disk.png</file>
-    <file>folder.png</file>
-    <file>printer.png</file>
-    <file>stop.png</file>
-  </qresource>
+    <qresource prefix="/">
+        <file>disk.png</file>
+        <file>folder.png</file>
+        <file>printer.png</file>
+        <file>stop.png</file>
+        <file>cog.png</file>
+        <file>information.png</file>
+    </qresource>
 </RCC>

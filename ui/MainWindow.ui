@@ -88,6 +88,10 @@
    <addaction name="actionOpenWorkingDirectory"/>
   </widget>
   <action name="actionSettings">
+   <property name="icon">
+    <iconset resource="../rc/rc.qrc">
+     <normaloff>:/cog.png</normaloff>:/cog.png</iconset>
+   </property>
    <property name="text">
     <string>Settings</string>
    </property>
@@ -132,6 +136,10 @@
    </property>
   </action>
   <action name="actionAbout">
+   <property name="icon">
+    <iconset resource="../rc/rc.qrc">
+     <normaloff>:/information.png</normaloff>:/information.png</iconset>
+   </property>
    <property name="text">
     <string>About</string>
    </property>
