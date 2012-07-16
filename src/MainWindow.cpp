@@ -184,8 +184,8 @@ void MainWindow::updateSettings()
 {
 	QSettings settings;
 	settings.beginGroup(APPEARANCE);
-	QColor consoleColor = settings.value(CONSOLE_COLOR, QColor(255, 255, 255)).value<QColor>();
-	QColor textColor = settings.value(TEXT_COLOR, QColor(0, 0, 0)).value<QColor>();
+	QColor consoleColor = settings.value(CONSOLE_COLOR).value<QColor>();
+	QColor textColor = settings.value(TEXT_COLOR).value<QColor>();
 	int fontSize = settings.value(FONT_SIZE, 14).toInt();
 	settings.endGroup();
 
