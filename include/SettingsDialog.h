@@ -3,6 +3,9 @@
 
 #include <QDialog>
 
+#define APPEARANCE "appearance"
+#define CONSOLE_COLOR "consolecolor"
+#define TEXT_COLOR "textcolor"
 #define KISS_CONNECTION "kissconnection"
 #define DISPLAY_NAME "displayname"
 #define DEFAULT "default"

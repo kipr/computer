@@ -23,8 +23,11 @@
     </property>
     <item>
      <widget class="ConsoleWidget" name="console">
-      <property name="styleSheet">
-       <string notr="true">font: 14pt &quot;Courier New&quot;;</string>
+      <property name="font">
+       <font>
+        <family>KacstDigital</family>
+        <pointsize>14</pointsize>
+       </font>
       </property>
      </widget>
     </item>

@@ -26,6 +26,9 @@ MainWindow::MainWindow(QWidget *parent)
 {
 	ui->setupUi(this);
 	
+	ui->menuFile->addAction(ui->actionPrint);
+	ui->menuFile->addAction(ui->actionSave);
+	
 	DeviceInfo deviceInfo;
 	deviceInfo.setDeviceType("computer");
 	deviceInfo.setDisplayName(displayName());
@@ -56,13 +59,12 @@ MainWindow::MainWindow(QWidget *parent)
 	if(success) ui->statusbar->showMessage(QString("Listening for connections on port %1").arg(8075), 0);
 	else ui->statusbar->showMessage("Error listening for incoming connections", 0);
 
-	ui->menuFile->addAction(ui->actionPrint);
-	ui->menuFile->addAction(ui->actionSave);
-
 	connect(ui->actionPrint, SIGNAL(activated()), this, SLOT(print()));
 	connect(ui->actionSave, SIGNAL(activated()), this, SLOT(saveToFile()));
 	connect(ui->actionAbout, SIGNAL(activated()), this, SLOT(about()));
 	connect(ui->actionSettings, SIGNAL(activated()), this, SLOT(settings()));
+	
+	updateSettings();
 }
 
 MainWindow::~MainWindow()
@@ -183,6 +185,21 @@ void MainWindow::updateSettings()
 	DeviceInfo deviceInfo = m_discovery.deviceInfo();
 	deviceInfo.setDisplayName(displayName());
 	m_discovery.setDeviceInfo(deviceInfo);
+	
+	QSettings settings;
+	settings.beginGroup(APPEARANCE);
+	QColor consoleColor = settings.value(CONSOLE_COLOR, QColor(255, 255, 255)).value<QColor>();
+	QColor textColor = settings.value(TEXT_COLOR, QColor(255, 255, 255)).value<QColor>();
+	settings.endGroup();
+	
+	QPalette pal = ui->console->palette();
+	pal.setColor(QPalette::Base, consoleColor);
+	ui->console->setPalette(pal);
+	
+	QString contents = ui->console->toPlainText();
+	ui->console->clear();
+	ui->console->setTextColor(textColor);
+	ui->console->setPlainText(contents);
 }
 
 QString MainWindow::displayName()
