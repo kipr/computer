@@ -13,6 +13,8 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QSettings>
+#include <QDesktopServices>
+#include <QUrl>
 #include <QDebug>
 
 using namespace EasyDevice;
@@ -63,6 +65,7 @@ MainWindow::MainWindow(QWidget *parent)
 	connect(ui->actionSave, SIGNAL(activated()), this, SLOT(saveToFile()));
 	connect(ui->actionAbout, SIGNAL(activated()), this, SLOT(about()));
 	connect(ui->actionSettings, SIGNAL(activated()), this, SLOT(settings()));
+	connect(ui->actionOpenWorkingDirectory, SIGNAL(activated()), this, SLOT(openWorkingDir()));
 	
 	updateSettings();
 }
@@ -170,6 +173,12 @@ void MainWindow::settings()
 	if(m_settingsDialog.exec()) updateSettings();
 }
 
+void MainWindow::openWorkingDir()
+{
+	QString path = QDir::toNativeSeparators(m_workingDirectory.absolutePath());
+	QDesktopServices::openUrl(QUrl("file:///" + path));
+}
+
 void MainWindow::killProcess()
 {
 	if(!m_process) return;
@@ -186,7 +195,8 @@ void MainWindow::updateSettings()
 	settings.beginGroup(APPEARANCE);
 	QColor consoleColor = settings.value(CONSOLE_COLOR).value<QColor>();
 	QColor textColor = settings.value(TEXT_COLOR).value<QColor>();
-	int fontSize = settings.value(FONT_SIZE, 14).toInt();
+	QFont font = settings.value(FONT).value<QFont>();
+	qreal fontSize = settings.value(FONT_SIZE).toInt();
 	settings.endGroup();
 
 	DeviceInfo deviceInfo = m_discovery.deviceInfo();
@@ -200,6 +210,7 @@ void MainWindow::updateSettings()
 	QString contents = ui->console->toPlainText();
 	ui->console->clear();
 	ui->console->setTextColor(textColor);
+	ui->console->setCurrentFont(font);
 	ui->console->setFontPointSize(fontSize);
 	ui->console->setPlainText(contents);
 }

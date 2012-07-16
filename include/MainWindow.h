@@ -36,6 +36,7 @@ public slots:
 	void saveToFile();
 	void about();
 	void settings();
+	void openWorkingDir();
 	
 private:
 	void killProcess();

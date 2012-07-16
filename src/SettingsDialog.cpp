@@ -37,6 +37,7 @@ void SettingsDialog::readSettings()
 	settings.beginGroup(APPEARANCE);
 	ui->consoleColorBox->setColor(settings.value(CONSOLE_COLOR, QColor(255, 255, 255)).value<QColor>());
 	ui->textColorBox->setColor(settings.value(TEXT_COLOR, QColor(0, 0, 0)).value<QColor>());
+	ui->fontBox->setCurrentFont(settings.value(FONT, QFont("Courier New")).value<QFont>());
 	ui->fontSizeBox->setValue(settings.value(FONT_SIZE, 14).toInt());
 	settings.endGroup();
 	
@@ -60,6 +61,7 @@ void SettingsDialog::saveSettings()
 	settings.beginGroup(APPEARANCE);
 	settings.setValue(CONSOLE_COLOR, ui->consoleColorBox->getColor());
 	settings.setValue(TEXT_COLOR, ui->textColorBox->getColor());
+	settings.setValue(FONT, ui->fontBox->currentFont());
 	settings.setValue(FONT_SIZE, ui->fontSizeBox->value());
 	settings.endGroup();
 	
