@@ -36,7 +36,8 @@ void SettingsDialog::readSettings()
 	
 	settings.beginGroup(APPEARANCE);
 	ui->consoleColorBox->setColor(settings.value(CONSOLE_COLOR, QColor(255, 255, 255)).value<QColor>());
-	ui->textColorBox->setColor(settings.value(TEXT_COLOR, QColor(255, 255, 255)).value<QColor>());
+	ui->textColorBox->setColor(settings.value(TEXT_COLOR, QColor(0, 0, 0)).value<QColor>());
+	ui->fontSizeBox->setValue(settings.value(FONT_SIZE, 14).toInt());
 	settings.endGroup();
 	
 	settings.beginGroup(KISS_CONNECTION);
@@ -59,6 +60,7 @@ void SettingsDialog::saveSettings()
 	settings.beginGroup(APPEARANCE);
 	settings.setValue(CONSOLE_COLOR, ui->consoleColorBox->getColor());
 	settings.setValue(TEXT_COLOR, ui->textColorBox->getColor());
+	settings.setValue(FONT_SIZE, ui->fontSizeBox->value());
 	settings.endGroup();
 	
 	settings.beginGroup(KISS_CONNECTION);

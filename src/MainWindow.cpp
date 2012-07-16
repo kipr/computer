@@ -182,15 +182,16 @@ void MainWindow::killProcess()
 
 void MainWindow::updateSettings()
 {
-	DeviceInfo deviceInfo = m_discovery.deviceInfo();
-	deviceInfo.setDisplayName(displayName());
-	m_discovery.setDeviceInfo(deviceInfo);
-	
 	QSettings settings;
 	settings.beginGroup(APPEARANCE);
 	QColor consoleColor = settings.value(CONSOLE_COLOR, QColor(255, 255, 255)).value<QColor>();
-	QColor textColor = settings.value(TEXT_COLOR, QColor(255, 255, 255)).value<QColor>();
+	QColor textColor = settings.value(TEXT_COLOR, QColor(0, 0, 0)).value<QColor>();
+	int fontSize = settings.value(FONT_SIZE, 14).toInt();
 	settings.endGroup();
+
+	DeviceInfo deviceInfo = m_discovery.deviceInfo();
+	deviceInfo.setDisplayName(displayName());
+	m_discovery.setDeviceInfo(deviceInfo);
 	
 	QPalette pal = ui->console->palette();
 	pal.setColor(QPalette::Base, consoleColor);
@@ -199,6 +200,7 @@ void MainWindow::updateSettings()
 	QString contents = ui->console->toPlainText();
 	ui->console->clear();
 	ui->console->setTextColor(textColor);
+	ui->console->setFontPointSize(fontSize);
 	ui->console->setPlainText(contents);
 }
 
