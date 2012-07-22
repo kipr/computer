@@ -3,22 +3,23 @@
 
 #include <QSettings>
 #include <QColor>
+#include <QDebug>
 
 SettingsDialog::SettingsDialog(QWidget *parent) :
-    QDialog(parent),
-    ui(new Ui::SettingsDialog)
+	QDialog(parent),
+	ui(new Ui::SettingsDialog)
 {
-    ui->setupUi(this);
-    
-    connect(ui->customDisplayNameButton, SIGNAL(toggled(bool)), ui->customDisplayNameEdit, SLOT(setEnabled(bool)));
-    
-    readSettings();
-    saveSettings();
+	ui->setupUi(this);
+	
+	connect(ui->customDisplayNameButton, SIGNAL(toggled(bool)), ui->customDisplayNameEdit, SLOT(setEnabled(bool)));
+	
+	readSettings();
+	saveSettings();
 }
 
 SettingsDialog::~SettingsDialog()
 {
-    delete ui;
+	delete ui;
 }
 
 int SettingsDialog::exec()
@@ -28,6 +29,13 @@ int SettingsDialog::exec()
 		return QDialog::Rejected;
 	saveSettings();
 	return QDialog::Accepted;
+}
+
+void SettingsDialog::on_defaultButton_clicked()
+{
+	QSettings settings;
+	settings.clear();
+	readSettings();
 }
 
 void SettingsDialog::readSettings()
