@@ -13,7 +13,7 @@ QColorBox::~QColorBox()
 {
 }
 
-QColor QColorBox::getColor()
+QColor QColorBox::getColor() const
 {
 	return m_color;
 }

@@ -9,7 +9,7 @@ Q_OBJECT
 public:
 	QColorBox(QWidget *parent = 0);
 	~QColorBox();
-	QColor getColor();
+	QColor getColor() const;
 	void setColor(QColor);
 
 private:
