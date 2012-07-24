@@ -20,19 +20,22 @@ class SettingsDialog;
 
 class SettingsDialog : public QDialog
 {
-    Q_OBJECT
-    
+	Q_OBJECT
+	
 public:
-    explicit SettingsDialog(QWidget *parent = 0);
-    ~SettingsDialog();
-    
-    int exec();
-    
+	explicit SettingsDialog(QWidget *parent = 0);
+	~SettingsDialog();
+	
+	int exec();
+	
+private slots:
+	void on_defaultButton_clicked();
+	
 private:
-    Ui::SettingsDialog *ui;
-    
-    void readSettings();
-    void saveSettings();
+	Ui::SettingsDialog *ui;
+	
+	void readSettings();
+	void saveSettings();
 };
 
 #endif // SETTINGSDIALOG_H

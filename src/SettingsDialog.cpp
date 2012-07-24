@@ -3,22 +3,23 @@
 
 #include <QSettings>
 #include <QColor>
+#include <QDebug>
 
 SettingsDialog::SettingsDialog(QWidget *parent) :
-    QDialog(parent),
-    ui(new Ui::SettingsDialog)
+	QDialog(parent),
+	ui(new Ui::SettingsDialog)
 {
-    ui->setupUi(this);
-    
-    connect(ui->customDisplayNameButton, SIGNAL(toggled(bool)), ui->customDisplayNameEdit, SLOT(setEnabled(bool)));
-    
-    readSettings();
-    saveSettings();
+	ui->setupUi(this);
+	
+	connect(ui->customDisplayNameButton, SIGNAL(toggled(bool)), ui->customDisplayNameEdit, SLOT(setEnabled(bool)));
+	
+	readSettings();
+	saveSettings();
 }
 
 SettingsDialog::~SettingsDialog()
 {
-    delete ui;
+	delete ui;
 }
 
 int SettingsDialog::exec()
@@ -28,6 +29,13 @@ int SettingsDialog::exec()
 		return QDialog::Rejected;
 	saveSettings();
 	return QDialog::Accepted;
+}
+
+void SettingsDialog::on_defaultButton_clicked()
+{
+	QSettings settings;
+	settings.clear();
+	readSettings();
 }
 
 void SettingsDialog::readSettings()
@@ -43,10 +51,9 @@ void SettingsDialog::readSettings()
 	
 	settings.beginGroup(KISS_CONNECTION);
 	settings.beginGroup(DISPLAY_NAME);
-	if(settings.value(DEFAULT, true).toBool())
-		ui->defaultDisplayNameButton->setChecked(true);
-	else
-		ui->customDisplayNameButton->setChecked(true);
+	const bool def = settings.value(DEFAULT, true).toBool();
+	ui->defaultDisplayNameButton->setChecked(def);
+	ui->customDisplayNameButton->setChecked(!def);
 	ui->customDisplayNameEdit->setText(settings.value(CUSTOM_NAME, "").toString());
 	settings.endGroup();
 	ui->disallowRemoteBox->setChecked(settings.value(DISALLOW_REMOTE, false).toBool());
@@ -56,7 +63,7 @@ void SettingsDialog::readSettings()
 void SettingsDialog::saveSettings()
 {
 	QSettings settings;
-	bool defaultChecked = ui->defaultDisplayNameButton->isChecked();
+	const bool defaultChecked = ui->defaultDisplayNameButton->isChecked();
 	
 	settings.beginGroup(APPEARANCE);
 	settings.setValue(CONSOLE_COLOR, ui->consoleColorBox->getColor());
