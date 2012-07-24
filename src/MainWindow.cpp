@@ -100,8 +100,8 @@ const bool MainWindow::run(const QString& name)
 	m_process = new QProcess();
 	m_process->setWorkingDirectory(m_workingDirectory.path());
 	ui->console->setProcess(m_process);
-	connect(m_process, SIGNAL(started()), this, SLOT(processStarted()));
 	connect(m_process, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(processFinished()));
+	processStarted();
 	m_process->start(m_compileResults.value(name)[0], QStringList());
 	extendTimeout();
 	
@@ -243,13 +243,15 @@ void MainWindow::processStarted()
 {
 	ui->actionStop->setEnabled(true);
 	m_time.restart();
+	ui->console->append(tr("Started at %1\n\n").arg(m_time.toString()));
 }
 
 void MainWindow::processFinished()
 {
 	ui->actionStop->setEnabled(false);
 	const int msecs = m_time.elapsed();
-	ui->console->append(tr("Finished at %1 in %2 seconds").arg(m_time.toString()).arg(msecs / 1000.0));
+	m_time.restart();
+	ui->console->append(tr("\nFinished at %1 in %2 seconds").arg(m_time.toString()).arg(msecs / 1000.0));
 }
 
 void MainWindow::terminateProcess()

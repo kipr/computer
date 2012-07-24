@@ -75,9 +75,8 @@ private:
 	QHostAddress m_currentAddress;
 	QByteArray m_hash;
 	QTimer m_timer;
-	EasyDevice::PasswordGenerator m_generator;
-	
 	QTime m_time;
+	EasyDevice::PasswordGenerator m_generator;
 };
 
 #endif
