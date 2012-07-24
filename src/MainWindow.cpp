@@ -16,6 +16,7 @@
 #include <QDesktopServices>
 #include <QCryptographicHash>
 #include <QUrl>
+#include <QNetworkInterface>
 #include <QDebug>
 
 using namespace EasyDevice;
@@ -142,14 +143,22 @@ Filesystem *MainWindow::filesystem()
 	return &m_filesystem;
 }
 
-const bool MainWindow::isAuthenticated(const QHostAddress& address) const
+const bool MainWindow::isAuthenticated(const QHostAddress& address)
 {
+	QSettings settings;
+	settings.beginGroup(KISS_CONNECTION);
+	
+	if(QNetworkInterface::allAddresses().contains(address)) {
+		m_currentAddress = QHostAddress();
+		return true;
+	}
+	if(settings.value(DISALLOW_REMOTE, false).toBool())
+		return false;
 	return m_currentAddress == address;
 }
 
 const bool MainWindow::authenticationRequest(const QHostAddress& address)
 {
-	m_currentAddress = QHostAddress();
 	QString string = m_generator.password();
 	ui->statusbar->showMessage(tr("Incoming connection. The password is ") + string, 0); // TODO: Make prettier
 	QCryptographicHash gen(QCryptographicHash::Sha1);

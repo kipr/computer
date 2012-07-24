@@ -33,7 +33,7 @@ public:
 	const bool download(const QString& name, TinyArchive *archive);
 	EasyDevice::Filesystem *filesystem();
 	
-	const bool isAuthenticated(const QHostAddress& address) const;
+	const bool isAuthenticated(const QHostAddress& address);
 	const bool authenticationRequest(const QHostAddress& address);
 	const bool authenticate(const QHostAddress& address, const QByteArray& hash);
 
