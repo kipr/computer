@@ -13,6 +13,7 @@
 #define DEFAULT "default"
 #define CUSTOM_NAME "customname"
 #define DISALLOW_REMOTE "disallowremote"
+#define TIMEOUT "timeout"
 
 namespace Ui {
 class SettingsDialog;

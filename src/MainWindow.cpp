@@ -230,7 +230,9 @@ void MainWindow::timeout()
 
 void MainWindow::extendTimeout()
 {
-	m_timer.start(60000); // 10 mins
+	QSettings settings;
+	settings.beginGroup(KISS_CONNECTION);
+	m_timer.start(settings.value(TIMEOUT).toInt() * 60000);
 }
 
 void MainWindow::killProcess()

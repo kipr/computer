@@ -56,6 +56,7 @@ void SettingsDialog::readSettings()
 	ui->customDisplayNameButton->setChecked(!def);
 	ui->customDisplayNameEdit->setText(settings.value(CUSTOM_NAME, "").toString());
 	settings.endGroup();
+	ui->timeoutBox->setValue(settings.value(TIMEOUT, 5).toInt());
 	ui->disallowRemoteBox->setChecked(settings.value(DISALLOW_REMOTE, false).toBool());
 	settings.endGroup();
 }
@@ -77,6 +78,7 @@ void SettingsDialog::saveSettings()
 	settings.setValue(DEFAULT, defaultChecked);
 	settings.setValue(CUSTOM_NAME, ui->customDisplayNameEdit->text());
 	settings.endGroup();
+	settings.setValue(TIMEOUT, ui->timeoutBox->value());
 	settings.setValue(DISALLOW_REMOTE, ui->disallowRemoteBox->isChecked());
 	settings.endGroup();
 	
