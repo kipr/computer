@@ -41,6 +41,7 @@ public:
 private slots:
 	void print();
 	void saveToFile();
+	void copy();
 	void about();
 	void settings();
 	void openWorkingDir();

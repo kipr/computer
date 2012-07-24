@@ -86,6 +86,7 @@
    </attribute>
    <addaction name="actionSave"/>
    <addaction name="actionPrint"/>
+   <addaction name="actionCopy"/>
    <addaction name="separator"/>
    <addaction name="actionStop"/>
    <addaction name="actionOpenWorkingDirectory"/>
@@ -148,6 +149,15 @@
    </property>
    <property name="text">
     <string>About</string>
+   </property>
+  </action>
+  <action name="actionCopy">
+   <property name="icon">
+    <iconset resource="../rc/rc.qrc">
+     <normaloff>:/page_white_copy.png</normaloff>:/page_white_copy.png</iconset>
+   </property>
+   <property name="text">
+    <string>Copy</string>
    </property>
   </action>
  </widget>

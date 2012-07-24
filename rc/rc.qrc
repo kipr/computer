@@ -6,5 +6,6 @@
         <file>stop.png</file>
         <file>cog.png</file>
         <file>information.png</file>
+        <file>page_white_copy.png</file>
     </qresource>
 </RCC>

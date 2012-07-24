@@ -17,6 +17,7 @@
 #include <QCryptographicHash>
 #include <QUrl>
 #include <QNetworkInterface>
+#include <QClipboard>
 #include <QDebug>
 
 using namespace EasyDevice;
@@ -67,6 +68,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 	connect(ui->actionPrint, SIGNAL(activated()), this, SLOT(print()));
 	connect(ui->actionSave, SIGNAL(activated()), this, SLOT(saveToFile()));
+	connect(ui->actionCopy, SIGNAL(activated()), this, SLOT(copy()));
 	connect(ui->actionStop, SIGNAL(activated()), this, SLOT(terminateProcess()));
 	connect(ui->actionAbout, SIGNAL(activated()), this, SLOT(about()));
 	connect(ui->actionSettings, SIGNAL(activated()), this, SLOT(settings()));
@@ -204,6 +206,17 @@ void MainWindow::saveToFile()
 
 	QTextStream out(&file);
 	out << ui->console->toPlainText();
+}
+
+void MainWindow::copy()
+{
+	QClipboard *clipboard = QApplication::clipboard();
+	QString selection = ui->console->textCursor().selectedText();
+	if(selection.isEmpty()) {
+		clipboard->setText(ui->console->toPlainText());
+		return;
+	}
+	clipboard->setText(selection);
 }
 
 void MainWindow::about()
