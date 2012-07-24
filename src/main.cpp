@@ -7,6 +7,8 @@ int main(int argc, char *argv[])
 {
 	QApplication app(argc, argv);
 	
+	srand(time(NULL));
+	
 #ifdef Q_OS_MAC
 	QDir::setCurrent(QApplication::applicationDirPath() + "/../");
 #else

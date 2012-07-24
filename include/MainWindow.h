@@ -3,11 +3,13 @@
 
 #include <QMainWindow>
 #include <QPrinter>
+#include <QTimer>
 
 #include <easydevice/Server.h>
 #include <easydevice/DiscoveryClient.h>
 #include <easydevice/ServerDelegate.h>
 #include <easydevice/Filesystem.h>
+#include <easydevice/PasswordGenerator.h>
 #include <kiss-compiler/Compilation.h>
 
 #include "SettingsDialog.h"
@@ -30,6 +32,10 @@ public:
 	CompilationPtr compile(const QString& name);
 	const bool download(const QString& name, TinyArchive *archive);
 	EasyDevice::Filesystem *filesystem();
+	
+	const bool isAuthenticated(const QHostAddress& address) const;
+	const bool authenticationRequest(const QHostAddress& address);
+	const bool authenticate(const QHostAddress& address, const QByteArray& hash);
 
 public slots:
 	void print();
@@ -37,6 +43,9 @@ public slots:
 	void about();
 	void settings();
 	void openWorkingDir();
+	
+	void timeout();
+	void extendTimeout();
 	
 private:
 	void killProcess();
@@ -57,6 +66,11 @@ private:
 	
 	QProcess *m_process;
 	Ui::MainWindow *ui;
+	
+	QHostAddress m_currentAddress;
+	QByteArray m_hash;
+	QTimer m_timer;
+	EasyDevice::PasswordGenerator m_generator;
 };
 
 #endif

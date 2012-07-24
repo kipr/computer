@@ -14,6 +14,7 @@
 #include <QMessageBox>
 #include <QSettings>
 #include <QDesktopServices>
+#include <QCryptographicHash>
 #include <QUrl>
 #include <QDebug>
 
@@ -24,7 +25,9 @@ MainWindow::MainWindow(QWidget *parent)
 	m_server(this),
 	m_discovery(this),
 	m_process(0),
-	ui(new Ui::MainWindow)
+	ui(new Ui::MainWindow),
+	m_timer(this),
+	m_generator(PasswordGenerator::Numbers | PasswordGenerator::Letters)
 {
 	ui->setupUi(this);
 	
@@ -68,6 +71,8 @@ MainWindow::MainWindow(QWidget *parent)
 	connect(ui->actionOpenWorkingDirectory, SIGNAL(activated()), this, SLOT(openWorkingDir()));
 	
 	updateSettings();
+	
+	connect(&m_timer, SIGNAL(timeout()), this, SLOT(timeout()));
 }
 
 MainWindow::~MainWindow()
@@ -94,7 +99,8 @@ const bool MainWindow::run(const QString& name)
 	m_process->setWorkingDirectory(m_workingDirectory.path());
 	ui->console->setProcess(m_process);
 	m_process->start(m_compileResults.value(name)[0], QStringList());
-
+	extendTimeout();
+	
 	return true;
 }
 
@@ -117,6 +123,7 @@ CompilationPtr MainWindow::compile(const QString& name)
 	
 	if(success) m_compileResults[name] = compilation->compileResults();
 	else m_compileResults.remove(name);
+	extendTimeout();
 	
 	return compilation;
 }
@@ -125,12 +132,40 @@ const bool MainWindow::download(const QString& name, TinyArchive *archive)
 {
 	m_filesystem.setProgram(name, archive);
 	m_compileResults.remove(name);
+	extendTimeout();
+	
 	return true;
 }
 
 Filesystem *MainWindow::filesystem()
 {
 	return &m_filesystem;
+}
+
+const bool MainWindow::isAuthenticated(const QHostAddress& address) const
+{
+	return m_currentAddress == address;
+}
+
+const bool MainWindow::authenticationRequest(const QHostAddress& address)
+{
+	m_currentAddress = QHostAddress();
+	QString string = m_generator.password();
+	ui->statusbar->showMessage(tr("Incoming connection. The password is ") + string, 0); // TODO: Make prettier
+	QCryptographicHash gen(QCryptographicHash::Sha1);
+	gen.addData(string.toUtf8());
+	m_hash = gen.result();
+	return true;
+}
+
+const bool MainWindow::authenticate(const QHostAddress& address, const QByteArray& hash)
+{
+	if(m_hash != hash) return false;
+	m_hash.clear();
+	m_currentAddress = address;
+	extendTimeout();
+	ui->statusbar->showMessage(tr("Paired with ") + m_currentAddress.toString(), 0);
+	return true;
 }
 
 void MainWindow::print()
@@ -149,8 +184,7 @@ void MainWindow::saveToFile()
 		return;
 	
 	QFile file(fileName);
-	if(!file.open(QFile::WriteOnly | QFile::Text))
-	{
+	if(!file.open(QFile::WriteOnly | QFile::Text)) {
 		QMessageBox::warning(this, tr("Error"), tr("Cannot write to file %1:\n%2.").arg(fileName).arg(file.errorString()));
 		return;
 	}
@@ -177,6 +211,17 @@ void MainWindow::openWorkingDir()
 {
 	QString path = QDir::toNativeSeparators(m_workingDirectory.absolutePath());
 	QDesktopServices::openUrl(QUrl("file:///" + path));
+}
+
+void MainWindow::timeout()
+{
+	ui->statusbar->showMessage("A command has not been sent in a while. Relocking.", 0);
+	m_currentAddress = QHostAddress();
+}
+
+void MainWindow::extendTimeout()
+{
+	m_timer.start(60000); // 10 mins
 }
 
 void MainWindow::killProcess()
