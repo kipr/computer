@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>507</width>
-    <height>300</height>
+    <height>317</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -84,12 +84,15 @@
         <item>
          <widget class="QLabel" name="timeoutLabel">
           <property name="text">
-           <string>Timeout (min):</string>
+           <string>Session timeout (min):</string>
           </property>
          </widget>
         </item>
         <item>
          <widget class="QSpinBox" name="timeoutBox">
+          <property name="toolTip">
+           <string>&lt;qt/&gt;The session timeout controls how long the device waits before requiring reauthorization. This timeout is reset every time the device receives a command.</string>
+          </property>
           <property name="suffix">
            <string/>
           </property>
