@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QPrinter>
+#include <QTime>
 #include <QTimer>
 
 #include <easydevice/Server.h>
@@ -37,7 +38,7 @@ public:
 	const bool authenticationRequest(const QHostAddress& address);
 	const EasyDevice::ServerDelegate::AuthenticateReturn authenticate(const QHostAddress& address, const QByteArray& hash);
 
-public slots:
+private slots:
 	void print();
 	void saveToFile();
 	void about();
@@ -49,6 +50,7 @@ public slots:
 	
 	void processStarted();
 	void processFinished();
+	void terminateProcess();
 	
 private:
 	void killProcess();
@@ -74,6 +76,8 @@ private:
 	QByteArray m_hash;
 	QTimer m_timer;
 	EasyDevice::PasswordGenerator m_generator;
+	
+	QTime m_time;
 };
 
 #endif

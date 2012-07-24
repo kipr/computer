@@ -67,6 +67,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 	connect(ui->actionPrint, SIGNAL(activated()), this, SLOT(print()));
 	connect(ui->actionSave, SIGNAL(activated()), this, SLOT(saveToFile()));
+	connect(ui->actionStop, SIGNAL(activated()), this, SLOT(terminateProcess()));
 	connect(ui->actionAbout, SIGNAL(activated()), this, SLOT(about()));
 	connect(ui->actionSettings, SIGNAL(activated()), this, SLOT(settings()));
 	connect(ui->actionOpenWorkingDirectory, SIGNAL(activated()), this, SLOT(openWorkingDir()));
@@ -241,11 +242,24 @@ void MainWindow::extendTimeout()
 void MainWindow::processStarted()
 {
 	ui->actionStop->setEnabled(true);
+	m_time.restart();
 }
 
 void MainWindow::processFinished()
 {
 	ui->actionStop->setEnabled(false);
+	const int msecs = m_time.elapsed();
+	ui->console->append(tr("Finished at %1 in %2 seconds").arg(m_time.toString()).arg(msecs / 1000.0));
+}
+
+void MainWindow::terminateProcess()
+{
+	if(!m_process) return;
+	m_process->terminate();
+	if(!m_process->waitForFinished(2000)) m_process->kill();
+	ui->console->setProcess(0);
+	delete m_process;
+	m_process = 0;
 }
 
 void MainWindow::killProcess()
