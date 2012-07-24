@@ -47,6 +47,9 @@ public slots:
 	void timeout();
 	void extendTimeout();
 	
+	void processStarted();
+	void processFinished();
+	
 private:
 	void killProcess();
 	void updateSettings();

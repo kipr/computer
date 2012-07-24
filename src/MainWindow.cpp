@@ -99,6 +99,8 @@ const bool MainWindow::run(const QString& name)
 	m_process = new QProcess();
 	m_process->setWorkingDirectory(m_workingDirectory.path());
 	ui->console->setProcess(m_process);
+	connect(m_process, SIGNAL(started()), this, SLOT(processStarted()));
+	connect(m_process, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(processFinished()));
 	m_process->start(m_compileResults.value(name)[0], QStringList());
 	extendTimeout();
 	
@@ -234,6 +236,16 @@ void MainWindow::extendTimeout()
 	QSettings settings;
 	settings.beginGroup(KISS_CONNECTION);
 	m_timer.start(settings.value(TIMEOUT).toInt() * 60000);
+}
+
+void MainWindow::processStarted()
+{
+	ui->actionStop->setEnabled(true);
+}
+
+void MainWindow::processFinished()
+{
+	ui->actionStop->setEnabled(false);
 }
 
 void MainWindow::killProcess()

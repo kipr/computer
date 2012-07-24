@@ -103,6 +103,9 @@
    </property>
   </action>
   <action name="actionStop">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset resource="../rc/rc.qrc">
      <normaloff>:/stop.png</normaloff>:/stop.png</iconset>
