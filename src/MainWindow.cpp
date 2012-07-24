@@ -167,14 +167,15 @@ const bool MainWindow::authenticationRequest(const QHostAddress& address)
 	return true;
 }
 
-const bool MainWindow::authenticate(const QHostAddress& address, const QByteArray& hash)
+const EasyDevice::ServerDelegate::AuthenticateReturn MainWindow::authenticate(const QHostAddress& address, const QByteArray& hash)
 {
-	if(m_hash != hash) return false;
+	if(m_hash.isNull()) return EasyDevice::ServerDelegate::AuthWillNotAccept;
+	if(hash.isNull() || m_hash != hash) return EasyDevice::ServerDelegate::AuthTryAgain;
 	m_hash.clear();
 	m_currentAddress = address;
 	extendTimeout();
 	ui->statusbar->showMessage(tr("Paired with ") + m_currentAddress.toString(), 0);
-	return true;
+	return EasyDevice::ServerDelegate::AuthSuccess;
 }
 
 void MainWindow::print()

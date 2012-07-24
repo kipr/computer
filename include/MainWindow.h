@@ -35,7 +35,7 @@ public:
 	
 	const bool isAuthenticated(const QHostAddress& address);
 	const bool authenticationRequest(const QHostAddress& address);
-	const bool authenticate(const QHostAddress& address, const QByteArray& hash);
+	const EasyDevice::ServerDelegate::AuthenticateReturn authenticate(const QHostAddress& address, const QByteArray& hash);
 
 public slots:
 	void print();
