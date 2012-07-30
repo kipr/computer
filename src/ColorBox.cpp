@@ -1,24 +1,24 @@
-#include "QColorBox.h"
+#include "ColorBox.h"
 #include <QDebug>
 #include <QColorDialog>
 
-QColorBox::QColorBox(QWidget *parent)
+ColorBox::ColorBox(QWidget *parent)
 	: QLineEdit(parent)
 {
 	setReadOnly(true);
 	m_color = palette().color(QPalette::Base);
 }
 
-QColorBox::~QColorBox()
+ColorBox::~ColorBox()
 {
 }
 
-QColor QColorBox::getColor() const
+QColor ColorBox::getColor() const
 {
 	return m_color;
 }
 
-void QColorBox::setColor(QColor color)
+void ColorBox::setColor(QColor color)
 {
 	QPalette pal = palette();
 	pal.setColor(QPalette::Base, color);
@@ -26,7 +26,7 @@ void QColorBox::setColor(QColor color)
 	m_color = color;
 }
 
-void QColorBox::mouseDoubleClickEvent(QMouseEvent *event)
+void ColorBox::mouseDoubleClickEvent(QMouseEvent *event)
 {
 	QColorDialog diag;
 	if(diag.exec()) setColor(diag.selectedColor());

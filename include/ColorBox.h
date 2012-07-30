@@ -1,14 +1,14 @@
-#ifndef _QCOLORBOX_H_
-#define _QCOLORBOX_H_
+#ifndef _COLORBOX_H_
+#define _COLORBOX_H_
 
 #include <QLineEdit>
 
-class QColorBox : public QLineEdit
+class ColorBox : public QLineEdit
 {
 Q_OBJECT
 public:
-	QColorBox(QWidget *parent = 0);
-	~QColorBox();
+	ColorBox(QWidget *parent = 0);
+	~ColorBox();
 	QColor getColor() const;
 	void setColor(QColor);
 
