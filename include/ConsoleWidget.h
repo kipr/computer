@@ -14,6 +14,9 @@ public:
 	void setProcess(QProcess *process);
 	QProcess *process() const;
 	
+signals:
+	void abortRequested();
+	
 protected:
 	void keyPressEvent(QKeyEvent * event);
 	void changeDir(const QString & dir);

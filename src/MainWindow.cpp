@@ -73,6 +73,7 @@ MainWindow::MainWindow(QWidget *parent)
 	connect(ui->actionAbout, SIGNAL(activated()), this, SLOT(about()));
 	connect(ui->actionSettings, SIGNAL(activated()), this, SLOT(settings()));
 	connect(ui->actionOpenWorkingDirectory, SIGNAL(activated()), this, SLOT(openWorkingDir()));
+	connect(ui->console, SIGNAL(abortRequested()), this, SLOT(terminateProcess()));
 	
 	updateSettings();
 	

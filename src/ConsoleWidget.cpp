@@ -2,6 +2,7 @@
 
 #include <QApplication>
 #include <QKeyEvent>
+#include <QDebug>
 
 ConsoleWidget::ConsoleWidget(QWidget *parent)
 	: QTextEdit(parent), m_process(0)
@@ -60,6 +61,7 @@ void ConsoleWidget::changeDir(const QString & dir)
 void ConsoleWidget::keyPressEvent(QKeyEvent * event)
 {
 	int key = event->key();
+	Qt::KeyboardModifiers modifiers = event->modifiers();
 
 	setTextCursor(curCursorLoc);
 
@@ -123,6 +125,8 @@ void ConsoleWidget::keyPressEvent(QKeyEvent * event)
 				this->setTextCursor(cursor);
 			} else QApplication::beep();
 		} else if (key == Qt::Key_Tab) {
+		} else if (key == Qt::Key_C && modifiers == Qt::ControlModifier) {
+			emit abortRequested();
 		} else {
 			QString text = event->text();
 			for (int i = 0; i < text.length(); ++i) {
