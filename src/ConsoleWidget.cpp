@@ -54,7 +54,7 @@ void ConsoleWidget::keyPressEvent(QKeyEvent * event)
 	else if(key == Qt::Key_Delete) {
 		if(!curCursorLoc.atBlockEnd()) {
 			QTextEdit::keyPressEvent(event);
-			cmdStr.remove(curCursorLoc.positionInBlock(), 1);
+			cmdStr.remove(inputCharCount, 1);
 		}
 		else QApplication::beep();
 	}
