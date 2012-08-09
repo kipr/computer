@@ -182,15 +182,6 @@ void ConsoleWidget::keyPressEvent(QKeyEvent * event)
 	curCursorLoc = textCursor();
 }
 
-void ConsoleWidget::changeDir(const QString & dir)
-{
-	QString theDir = QString(dir);
-	theDir = theDir.replace(QChar('/'), "\\");
-	m_process->write("cd ", 3);
-	m_process->write(theDir.toAscii().data(), theDir.length());
-	m_process->write("\r\n", 2);
-}
-
 void ConsoleWidget::readStandardOut()
 {
 	insertPlainText(m_process->readAllStandardOutput());

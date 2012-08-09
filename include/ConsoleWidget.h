@@ -19,15 +19,12 @@ signals:
 	
 protected:
 	void keyPressEvent(QKeyEvent * event);
-	void changeDir(const QString & dir);
 
 private slots:
 	void readStandardOut();
 	void readStandardErr();
 
 private:
-	void printPrompt();
-	
 	int inputCharCount;
 	QTextCursor curCursorLoc;
 	QString cmdStr;
