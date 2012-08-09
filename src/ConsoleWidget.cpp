@@ -130,7 +130,30 @@ void ConsoleWidget::keyPressEvent(QKeyEvent * event)
 	
 	else if (key == Qt::Key_Tab) {}
 	
-	else if (key == Qt::Key_C && modifiers == Qt::ControlModifier) emit abortRequested();
+	else if (modifiers == Qt::ControlModifier && key == Qt::Key_C) emit abortRequested();
+	
+	else if ((modifiers == Qt::ControlModifier && key == Qt::Key_A) || key == Qt::Key_Home) {
+		inputCharCount = 0;
+		moveCursor(QTextCursor::StartOfLine);
+	}
+	else if ((modifiers == Qt::ControlModifier && key == Qt::Key_E) || key == Qt::Key_End) {
+		inputCharCount = cmdStr.length();
+		moveCursor(QTextCursor::EndOfLine);
+	}
+	else if (modifiers == Qt::ControlModifier && key == Qt::Key_K) {
+		moveCursor(QTextCursor::EndOfLine);
+		for (int i = inputCharCount; i < cmdStr.length(); ++i) {
+			QTextEdit::keyPressEvent(new QKeyEvent(QEvent::KeyPress, Qt::Key_Backspace, Qt::NoModifier));
+		}
+		cmdStr.remove(inputCharCount, cmdStr.length() - inputCharCount);
+	}
+	else if (modifiers == Qt::ControlModifier && key == Qt::Key_U) {
+		for(int i = 0; i < inputCharCount; ++i) {
+			QTextEdit::keyPressEvent(new QKeyEvent(QEvent::KeyPress, Qt::Key_Backspace, Qt::NoModifier));
+		}
+		cmdStr.remove(0, inputCharCount);
+		inputCharCount = 0;
+	}
 	
 	else {
 		QString text = event->text();
