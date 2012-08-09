@@ -32,6 +32,7 @@ MainWindow::MainWindow(QWidget *parent)
 	m_generator(PasswordGenerator::Numbers | PasswordGenerator::Letters)
 {
 	ui->setupUi(this);
+	setWindowTitle(QUserInfo::username() + "'s Computer");
 	
 	ui->menuFile->addAction(ui->actionPrint);
 	ui->menuFile->addAction(ui->actionSave);
