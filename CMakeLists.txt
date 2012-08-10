@@ -42,7 +42,7 @@ ELSEIF(UNIX)
 	ADD_EXECUTABLE(computer ${computer_SRCS_CXX})
 ELSEIF(WIN32)
 	SET(CMAKE_CXX_FLAGS "-Wl,--enable-auto-import")
-	ADD_EXECUTABLE(computer WIN32 ${computer_SRCS_CXX} rc/logos/kiss.rc)
+	ADD_EXECUTABLE(computer WIN32 ${computer_SRCS_CXX})
 ENDIF()
 
 SET(EXECUTABLE_OUTPUT_PATH ${computer_SOURCE_DIR}/deploy)
