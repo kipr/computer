@@ -1,6 +1,7 @@
 #include "MainWindow.h"
 
 #include <QApplication>
+#include "time.h"
 #include <kiss-compiler/CompilerPluginManager.h>
 
 int main(int argc, char *argv[])
