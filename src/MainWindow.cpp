@@ -6,9 +6,11 @@
 #include <kiss-compiler/ArchiveWriter.h>
 #include <kiss-compiler/Temporary.h>
 #include <kiss-compiler/CompilerManager.h>
+#include <kiss-compiler/QTinyArchiveStream.h>
 
 #include "Computer.h"
 #include "QUserInfo.h"
+
 #include <QPrintDialog>
 #include <QFileDialog>
 #include <QMessageBox>
@@ -17,6 +19,7 @@
 #include <QCryptographicHash>
 #include <QUrl>
 #include <QNetworkInterface>
+#include <QFileSystemModel>
 #include <QClipboard>
 #include <QDebug>
 
@@ -29,13 +32,11 @@ MainWindow::MainWindow(QWidget *parent)
 	m_process(0),
 	ui(new Ui::MainWindow),
 	m_timer(this),
-	m_generator(PasswordGenerator::Numbers | PasswordGenerator::Letters)
+	m_generator(PasswordGenerator::Numbers | PasswordGenerator::Letters),
+	m_filesystemModel(new QFileSystemModel(this))
 {
 	ui->setupUi(this);
 	setWindowTitle(QUserInfo::username() + "'s Computer");
-	
-	ui->menuFile->addAction(ui->actionPrint);
-	ui->menuFile->addAction(ui->actionSave);
 	
 	DeviceInfo deviceInfo;
 	deviceInfo.setDeviceType("computer");
@@ -66,7 +67,12 @@ MainWindow::MainWindow(QWidget *parent)
 	
 	if(success) ui->statusbar->showMessage(QString("Listening for connections on port %1").arg(8075), 0);
 	else ui->statusbar->showMessage("Error listening for incoming connections", 0);
-
+	
+	m_filesystemModel->setFilter(QDir::NoDot | QDir::NoDotDot | QDir::Files);
+	m_filesystemModel->setNameFilters(QStringList() << "*.kissproj");
+	ui->programWidget->hide();
+	ui->programList->setModel(m_filesystemModel);
+	
 	connect(ui->actionPrint, SIGNAL(activated()), this, SLOT(print()));
 	connect(ui->actionSave, SIGNAL(activated()), this, SLOT(saveToFile()));
 	connect(ui->actionCopy, SIGNAL(activated()), this, SLOT(copy()));
@@ -75,6 +81,11 @@ MainWindow::MainWindow(QWidget *parent)
 	connect(ui->actionSettings, SIGNAL(activated()), this, SLOT(settings()));
 	connect(ui->actionOpenWorkingDirectory, SIGNAL(activated()), this, SLOT(openWorkingDir()));
 	connect(ui->console, SIGNAL(abortRequested()), this, SLOT(terminateProcess()));
+	connect(ui->deleteButton, SIGNAL(clicked()), this, SLOT(deleteSelectedPrograms()));
+	connect(ui->runButton, SIGNAL(clicked()), this, SLOT(runSelectedProgram()));
+	
+	connect(ui->programList->selectionModel(), SIGNAL(selectionChanged(QItemSelection, QItemSelection)), this, SLOT(programSelectionChanged(QItemSelection)));
+	programSelectionChanged(ui->programList->selectionModel()->selection());
 	
 	updateSettings();
 	
@@ -85,12 +96,11 @@ MainWindow::~MainWindow()
 {
 	killProcess();
 	delete ui;
+	delete m_filesystemModel;
 }
 
 const bool MainWindow::run(const QString& name)
 {
-	if(!m_filesystem.program(name)) return false;
-
 	qDebug() << name << "has the following results avail for running:" << m_compileResults.value(name);
 	if(!m_compileResults.value(name).size()) {
 		compile(name);
@@ -102,11 +112,13 @@ const bool MainWindow::run(const QString& name)
 
 	killProcess();
 	m_process = new QProcess();
+	m_process->setProcessEnvironment(QProcessEnvironment::systemEnvironment());
 	m_process->setWorkingDirectory(m_workingDirectory.path());
 	ui->console->setProcess(m_process);
 	connect(m_process, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(processFinished()));
 	processStarted();
 	m_process->start(m_compileResults.value(name)[0], QStringList());
+	raise();
 	extendTimeout();
 	
 	return true;
@@ -114,7 +126,11 @@ const bool MainWindow::run(const QString& name)
 
 CompilationPtr MainWindow::compile(const QString& name)
 {
-	TinyArchive *archive = m_filesystem.program(name);
+	QFile saveFile(programSavePath(name));
+	if(!saveFile.open(QIODevice::ReadOnly)) return CompilationPtr();
+	QTinyArchiveStream in(&saveFile);
+	TinyArchive *archive = TinyArchive::read(&in);
+	saveFile.close();
 	if(!archive) return CompilationPtr();
 	
 	ArchiveWriter writer(archive, Temporary::subdir(name));
@@ -123,7 +139,7 @@ CompilationPtr MainWindow::compile(const QString& name)
 	QDataStream stream(rawSettings);
 	stream >> settings;
 	
-	CompilationPtr compilation(new Compilation(CompilerManager::ref().compilers(), name, writer.files(), settings, "kovan"));
+	CompilationPtr compilation(new Compilation(CompilerManager::ref().compilers(), name, writer.files(), settings, "computer"));
 	bool success = compilation->start();
 	qDebug() << "Results:" << compilation->compileResults();
 	
@@ -133,21 +149,41 @@ CompilationPtr MainWindow::compile(const QString& name)
 	else m_compileResults.remove(name);
 	extendTimeout();
 	
+	delete archive;
+	
 	return compilation;
 }
 
 const bool MainWindow::download(const QString& name, TinyArchive *archive)
 {
-	m_filesystem.setProgram(name, archive);
-	m_compileResults.remove(name);
 	extendTimeout();
-	
+	m_compileResults.remove(name);
+	QFile saveFile(programSavePath(name));
+	if(!saveFile.open(QIODevice::WriteOnly)) return false;
+	QTinyArchiveStream out(&saveFile);
+	archive->write(&out);
+	saveFile.close();
 	return true;
 }
 
 Filesystem *MainWindow::filesystem()
 {
 	return &m_filesystem;
+}
+
+QStringList MainWindow::list() const
+{
+	return QStringList();
+}
+
+bool MainWindow::deleteProgram(const QString& name)
+{
+	return false;
+}
+
+QString MainWindow::interaction(const QString& command)
+{
+	return "Interaction not implemented";
 }
 
 const bool MainWindow::isAuthenticated(const QHostAddress& address)
@@ -187,11 +223,12 @@ const EasyDevice::ServerDelegate::AuthenticateReturn MainWindow::authenticate(co
 
 void MainWindow::print()
 {
-	QPrintDialog *printDialog = new QPrintDialog(&m_printer, this);
+	QPrinter printer;
+	QPrintDialog *printDialog = new QPrintDialog(&printer, this);
 	printDialog->setWindowTitle(tr("Print"));
 	if (printDialog->exec() != QDialog::Accepted)
 		return;
-	ui->console->print(&m_printer);
+	ui->console->print(&printer);
 }
 
 void MainWindow::saveToFile()
@@ -279,6 +316,30 @@ void MainWindow::terminateProcess()
 	m_process = 0;
 }
 
+void MainWindow::runSelectedProgram()
+{
+	QItemSelectionModel *selection = ui->programList->selectionModel();
+	QModelIndexList indexes = selection->selectedIndexes();
+	if(indexes.size() != 1) return;
+	QModelIndex index = indexes[0];
+	QString fileName = m_filesystemModel->fileName(index);
+	run(QFileInfo(fileName).completeBaseName());
+}
+
+void MainWindow::deleteSelectedPrograms()
+{
+	QItemSelectionModel *selection = ui->programList->selectionModel();
+	QModelIndexList indexes = selection->selectedIndexes();
+	foreach(const QModelIndex& index, indexes) m_filesystemModel->remove(index);
+}
+
+void MainWindow::programSelectionChanged(const QItemSelection& selection)
+{
+	QModelIndexList indexes = selection.indexes();
+	ui->deleteButton->setEnabled(!indexes.isEmpty());
+	ui->runButton->setEnabled(indexes.size() == 1);
+}
+
 void MainWindow::killProcess()
 {
 	if(!m_process) return;
@@ -297,6 +358,7 @@ void MainWindow::updateSettings()
 	QColor textColor = settings.value(TEXT_COLOR).value<QColor>();
 	QFont font = settings.value(FONT).value<QFont>();
 	qreal fontSize = settings.value(FONT_SIZE).toInt();
+	ui->console->document()->setMaximumBlockCount(settings.value(MAXIMUM_SCROLLBACK, 100000).toInt());
 	settings.endGroup();
 
 	DeviceInfo deviceInfo = m_discovery.deviceInfo();
@@ -313,6 +375,14 @@ void MainWindow::updateSettings()
 	ui->console->setCurrentFont(font);
 	ui->console->setFontPointSize(fontSize);
 	ui->console->setPlainText(contents);
+	
+	settings.beginGroup(STORAGE);
+	QString path = settings.value(PROGRAM_DIRECTORY, QDir::homePath() + "/" + tr("KISS Programs")).toString();
+	QDir pathDir(path);
+	if(!pathDir.exists()) QDir().mkpath(path);
+	m_filesystemModel->setRootPath(path);
+	ui->programList->setRootIndex(m_filesystemModel->index(path));
+	settings.endGroup();
 }
 
 QString MainWindow::displayName()
@@ -323,11 +393,16 @@ QString MainWindow::displayName()
 	settings.beginGroup(KISS_CONNECTION);
 	settings.beginGroup(DISPLAY_NAME);
 	if(settings.value(DEFAULT).toBool())
-		ret = QUserInfo::username();
+		ret = QUserInfo::username() + "'s Computer";
 	else
 		ret = settings.value(CUSTOM_NAME).toString();
 	settings.endGroup();
 	settings.endGroup();
 	
 	return ret;
+}
+
+QString MainWindow::programSavePath(const QString& name) const
+{
+	return QDir(m_filesystemModel->rootPath()).filePath(name + ".kissproj");
 }

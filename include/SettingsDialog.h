@@ -14,6 +14,10 @@
 #define CUSTOM_NAME "customname"
 #define DISALLOW_REMOTE "disallowremote"
 #define TIMEOUT "timeout"
+#define STORAGE "storage"
+#define PROGRAM_DIRECTORY "programdir"
+#define CONSOLE
+#define MAXIMUM_SCROLLBACK "maxscrollback"
 
 namespace Ui {
 class SettingsDialog;
@@ -31,6 +35,7 @@ public:
 	
 private slots:
 	void on_defaultButton_clicked();
+	void on_programDirectoryBrowse_clicked();
 	
 private:
 	Ui::SettingsDialog *ui;

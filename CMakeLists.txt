@@ -24,7 +24,7 @@ SET(computer_SRCS_CXX ${SOURCES})
 SET(computer_UI ${UIS})
 SET(computer_MOC_SRCS ${INCLUDES})
 
-SET(computer_QRC_FILES ${RC}/rc.qrc)
+SET(computer_QRC_FILES ${RC}/icons.qrc ${RC}/platform.qrc)
 
 QT4_WRAP_CPP(computer_SRCS_CXX ${computer_MOC_SRCS})
 QT4_WRAP_UI(computer_SRCS_CXX ${computer_UI})
@@ -48,6 +48,27 @@ ENDIF()
 SET(EXECUTABLE_OUTPUT_PATH ${computer_SOURCE_DIR}/deploy)
 SET(LIBRARY_OUTPUT_PATH ${computer_SOURCE_DIR}/lib)
 TARGET_LINK_LIBRARIES(computer ${QT_LIBRARIES} qscintilla2 kiss-compiler easydevice tinyarchive z)
+
+macro(copy_files FILES DESTINATION)
+  add_custom_target(copy ALL
+    COMMENT "Copying files: ${FILES}")
+
+  foreach(FILENAME ${FILES})
+    get_filename_component(REAL_FILENAME ${FILENAME} NAME)
+    set(DST "${DESTINATION}/${REAL_FILENAME}")
+
+    add_custom_command(
+      TARGET copy
+      COMMAND ${CMAKE_COMMAND} -E copy "${FILENAME}" "${DST}"
+      )
+  endforeach(FILENAME)
+endmacro(copy_files)
+
+IF(APPLE)
+copy_files(${RC}/target.h ${computer_SOURCE_DIR}/deploy/computer.app/Contents/prefix/usr/include)
+ELSE(APPLE)
+copy_files(${RC}/target.h ${computer_SOURCE_DIR}/deploy/prefix/usr/include)
+ENDIF(APPLE)
 
 IF(APPLE)
 	ADD_CUSTOM_TARGET(computer_MacDeployQt ALL 

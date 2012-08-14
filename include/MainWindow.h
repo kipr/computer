@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QPrinter>
 #include <QTime>
+#include <QItemSelection>
 #include <QTimer>
 
 #include <easydevice/Server.h>
@@ -21,6 +22,7 @@ namespace Ui
 }
 
 class QProcess;
+class QFileSystemModel;
 
 class MainWindow : public QMainWindow, public EasyDevice::ServerDelegate
 {
@@ -33,6 +35,10 @@ public:
 	CompilationPtr compile(const QString& name);
 	const bool download(const QString& name, TinyArchive *archive);
 	EasyDevice::Filesystem *filesystem();
+	
+	QStringList list() const;
+	virtual bool deleteProgram(const QString& name);
+	virtual QString interaction(const QString& command);
 	
 	const bool isAuthenticated(const QHostAddress& address);
 	const bool authenticationRequest(const QHostAddress& address);
@@ -53,12 +59,16 @@ private slots:
 	void processFinished();
 	void terminateProcess();
 	
+	void runSelectedProgram();
+	void deleteSelectedPrograms();
+	
+	void programSelectionChanged(const QItemSelection& selection);
+	
 private:
 	void killProcess();
 	void updateSettings();
 	QString displayName();
-	
-	QPrinter m_printer;
+	QString programSavePath(const QString& name) const;
 
 	EasyDevice::Server m_server;
 	EasyDevice::DiscoveryClient m_discovery;
@@ -78,6 +88,8 @@ private:
 	QTimer m_timer;
 	QTime m_time;
 	EasyDevice::PasswordGenerator m_generator;
+	
+	QFileSystemModel *m_filesystemModel;
 };
 
 #endif
