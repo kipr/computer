@@ -23,6 +23,7 @@ void debugLogHandler(QtMsgType type, const char *msg)
 		fprintf(fp, "%s\n", msg);
 		abort();
 	}
+	fflush(fp);
 }
 int main(int argc, char *argv[])
 {
@@ -52,8 +53,6 @@ int main(int argc, char *argv[])
 	MainWindow mainWindow;
 	mainWindow.show();
 	mainWindow.raise();
-	
-	fclose(fp);
 	
 	return app.exec();
 }
