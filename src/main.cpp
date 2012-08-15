@@ -5,7 +5,7 @@
 #include <kiss-compiler/CompilerPluginManager.h>
 #include <kiss-compiler/PlatformHintsManager.h>
 
-FILE *fp;
+// FILE *fp;
 
 void debugLogHandler(QtMsgType type, const char *msg)
 {
@@ -31,9 +31,8 @@ int main(int argc, char *argv[])
 	
 	srand(time(NULL));
 	
-	fp = fopen("output.txt", "w");
-	
-	qInstallMsgHandler(debugLogHandler);
+	// fp = fopen("output.txt", "w");
+	// qInstallMsgHandler(debugLogHandler);
 	
 #ifdef Q_OS_MAC
 	QDir::setCurrent(QApplication::applicationDirPath() + "/../");
