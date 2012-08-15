@@ -4,4 +4,4 @@ CXX_FLAGS = -Wall -I${PREFIX}/usr/include -include stdio.h -include kiss.h -incl
 LD_FLAGS = -L${PREFIX}/usr/lib -lkiss -lglfw -lblobtastic
 
 [osx]
-LD_FLAGS = -framework OpenGL -framework CoreFoundation -framework IOKit -framework Cocoa
+LD_FLAGS = -framework OpenGL -framework CoreFoundation -framework IOKit -framework Cocoa -framework Carbon
