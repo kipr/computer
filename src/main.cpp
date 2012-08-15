@@ -5,11 +5,34 @@
 #include <kiss-compiler/CompilerPluginManager.h>
 #include <kiss-compiler/PlatformHintsManager.h>
 
+FILE *fp;
+
+void debugLogHandler(QtMsgType type, const char *msg)
+{
+	switch (type) {
+	case QtDebugMsg:
+		fprintf(fp, "%s\n", msg);
+		break;
+	case QtWarningMsg:
+		fprintf(fp, "%s\n", msg);
+		break;
+	case QtCriticalMsg:
+		fprintf(fp, "%s\n", msg);
+		break;
+	case QtFatalMsg:
+		fprintf(fp, "%s\n", msg);
+		abort();
+	}
+}
 int main(int argc, char *argv[])
 {
 	QApplication app(argc, argv);
 	
 	srand(time(NULL));
+	
+	fp = fopen("output.txt", "w");
+	
+	qInstallMsgHandler(debugLogHandler);
 	
 #ifdef Q_OS_MAC
 	QDir::setCurrent(QApplication::applicationDirPath() + "/../");
@@ -29,6 +52,8 @@ int main(int argc, char *argv[])
 	MainWindow mainWindow;
 	mainWindow.show();
 	mainWindow.raise();
+	
+	fclose(fp);
 	
 	return app.exec();
 }

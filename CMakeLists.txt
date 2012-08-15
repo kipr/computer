@@ -76,13 +76,13 @@ IF(APPLE)
 		WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
 		DEPENDS computer)
 	
-#	ADD_CUSTOM_TARGET(Info.plist ALL 
-#		COMMAND ${CMAKE_COMMAND} -E copy ${RC}/Info.plist ${computer_SOURCE_DIR}/deploy/computer.app/Contents
-#		WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-#		DEPENDS computer)
-#	
-#	ADD_CUSTOM_TARGET(Icons ALL 
-#		COMMAND ${CMAKE_COMMAND} -E copy ${RC}/logos/mac_icon.icns ${computer_SOURCE_DIR}/deploy/computer.app/Contents/Resources
-#		WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-#		DEPENDS computer Info.plist MacDeployQt)
+	ADD_CUSTOM_TARGET(Info.plist ALL 
+		COMMAND ${CMAKE_COMMAND} -E copy ${RC}/Info.plist ${computer_SOURCE_DIR}/deploy/computer.app/Contents
+		WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+		DEPENDS computer)
+	
+	ADD_CUSTOM_TARGET(Icons ALL 
+		COMMAND ${CMAKE_COMMAND} -E copy ${RC}/mac_icon.icns ${computer_SOURCE_DIR}/deploy/computer.app/Contents/Resources
+		WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+		DEPENDS computer Info.plist computer_MacDeployQt)
 ENDIF()
