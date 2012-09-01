@@ -173,9 +173,8 @@ Filesystem *MainWindow::filesystem()
 
 QStringList MainWindow::list() const
 {
-	return Qm_filesystem->entries(QDir::Files | QDir::NoDot | QDir::NoDotDot);
-	
-	
+	//return m_filesystem.entries(QDir::Files | QDir::NoDot | QDir::NoDotDot);
+	return QStringList();
 }
 
 bool MainWindow::deleteProgram(const QString& name)
