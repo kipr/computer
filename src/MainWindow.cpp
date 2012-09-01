@@ -112,8 +112,10 @@ const bool MainWindow::run(const QString& name)
 
 	killProcess();
 	m_process = new QProcess();
-	m_process->setProcessEnvironment(QProcessEnvironment::systemEnvironment());
-	qDebug() << m_process->processEnvironment().toStringList();
+	QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+	// TODO: This will only work on OS X
+	env.insert("DYLD_LIBRARY_PATH", QDir::currentPath() + "/prefix/usr/lib:" + env.value("DYLD_LIBRARY_PATH"));
+	m_process->setProcessEnvironment(env);
 	m_process->setWorkingDirectory(m_workingDirectory.path());
 	ui->console->setProcess(m_process);
 	connect(m_process, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(processFinished()));
