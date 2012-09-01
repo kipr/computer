@@ -113,6 +113,7 @@ const bool MainWindow::run(const QString& name)
 	killProcess();
 	m_process = new QProcess();
 	m_process->setProcessEnvironment(QProcessEnvironment::systemEnvironment());
+	qDebug() << m_process->processEnvironment().toStringList();
 	m_process->setWorkingDirectory(m_workingDirectory.path());
 	ui->console->setProcess(m_process);
 	connect(m_process, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(processFinished()));
