@@ -1,12 +1,8 @@
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
 
-#include <easydevice/DiscoveryConstants.h>
-
-#include <kiss-compiler/ArchiveWriter.h>
-#include <kiss-compiler/Temporary.h>
-#include <kiss-compiler/CompilerManager.h>
-#include <kiss-compiler/QTinyArchiveStream.h>
+#include <easydevice/discovery_constants.hpp>
+#include <pcompiler/pcompiler.hpp>
 
 #include "Computer.h"
 #include "QUserInfo.h"
@@ -69,7 +65,7 @@ MainWindow::MainWindow(QWidget *parent)
 	else ui->statusbar->showMessage("Error listening for incoming connections", 0);
 	
 	m_filesystemModel->setFilter(QDir::NoDot | QDir::NoDotDot | QDir::Files);
-	m_filesystemModel->setNameFilters(QStringList() << "*.kissproj");
+	m_filesystemModel->setNameFilters(QStringList() << "*.kar");
 	ui->programWidget->hide();
 	ui->programList->setModel(m_filesystemModel);
 	
@@ -101,14 +97,9 @@ MainWindow::~MainWindow()
 
 const bool MainWindow::run(const QString& name)
 {
-	qDebug() << name << "has the following results avail for running:" << m_compileResults.value(name);
-	if(!m_compileResults.value(name).size()) {
-		compile(name);
-	}
-	if(!m_compileResults.value(name).size()) {
-		qCritical() << "Cannot run" << name << ". No results.";
-		return false;
-	}
+	if(m_compileResults.value(name).isEmpty()) compile(name);
+	if(m_compileResults.value(name).isEmpty()) return false;
+	
 
 	killProcess();
 	m_process = new QProcess();
@@ -120,53 +111,103 @@ const bool MainWindow::run(const QString& name)
 	ui->console->setProcess(m_process);
 	connect(m_process, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(processFinished()));
 	processStarted();
-	m_process->start(m_compileResults.value(name)[0], QStringList());
+	m_process->start(m_compileResults.value(name), QStringList());
 	raise();
 	extendTimeout();
 	
 	return true;
 }
 
-CompilationPtr MainWindow::compile(const QString& name)
+struct Cleaner
 {
-	QFile saveFile(programSavePath(name));
-	if(!saveFile.open(QIODevice::ReadOnly)) return CompilationPtr();
-	QTinyArchiveStream in(&saveFile);
-	TinyArchive *archive = TinyArchive::read(&in);
-	saveFile.close();
-	if(!archive) return CompilationPtr();
+public:
+	Cleaner(const QString& path)
+		: path(path)
+	{
+	}
 	
-	ArchiveWriter writer(archive, Temporary::subdir(name));
-	QMap<QString, QString> settings;
-	QByteArray rawSettings = QTinyNode::data(archive->lookup("settings:"));
-	QDataStream stream(rawSettings);
-	stream >> settings;
+	~Cleaner()
+	{
+		remove(path);
+	}
 	
-	CompilationPtr compilation(new Compilation(CompilerManager::ref().compilers(), name, writer.files(), settings, "computer"));
-	bool success = compilation->start();
-	qDebug() << "Results:" << compilation->compileResults();
+private:
+	bool remove(const QString& path)
+	{
+		QDir dir(path);
+
+		if(!dir.exists()) return true;
+		
+		QFileInfoList entries = dir.entryInfoList(QDir::NoDotAndDotDot | QDir::System | QDir::Hidden
+			| QDir::AllDirs | QDir::Files, QDir::DirsFirst);
+		
+		foreach(const QFileInfo& entry, entries) {
+			const QString entryPath = entry.absoluteFilePath();
+			if(!(entry.isDir() ? remove(entryPath) : QFile::remove(entryPath))) return false;
+		}
+		
+		if(!dir.rmdir(path)) return false;
+		
+		return true;
+	}
 	
-	qDebug() << (success ? "Compile Succeeded" : "Compile Failed");
+	QString path;
+};
+
+Compiler::OutputList MainWindow::compile(const QString& name)
+{
+	using namespace Compiler;
+	using namespace Kiss;
 	
-	if(success) m_compileResults[name] = compilation->compileResults();
-	else m_compileResults.remove(name);
-	extendTimeout();
+	KarPtr archive = Kar::load(programSavePath(name));
+	QString path = tempPath();
+	qDebug() << "Extracting to" << path;
+	if(!archive->extract(path)) {
+		return OutputList() << Output(programSavePath(name), 1,
+			QByteArray(), "error: Failed to extract KISS Archive.");
+	}
+	QStringList extractedFiles;
+	foreach(const QString& file, archive->files()) {
+		extractedFiles << path + "/" + file;
+	}
+	Input input = Input::fromList(extractedFiles);
+	Engine engine(Compilers::instance()->compilers());
+	OutputList ret = engine.compile(input, Options::load(":/platform.hints"));
+	Cleaner cleaner(path);
+	unsigned int terminals = 0;
+	QString firstTerminalFile;
+	bool success = true;
+	foreach(const Output& out, ret) {
+		if(out.isTerminal() && out.generatedFiles().size() == 1) {
+			if(!terminals) firstTerminalFile = out.generatedFiles()[0];
+			++terminals;
+		}
+		success &= out.exitCode() == 0 && out.error().isEmpty();
+	}
+	if(success && !terminals) {
+		ret << OutputList() << Output(programSavePath(name), 1,
+		QByteArray(), "error: No terminals detected from compilation.");
+		return ret;
+	}
+	if(success && terminals > 1) ret << Output(programSavePath(name), 0,
+		"warning: Terminal ambiguity in compilation. " 
+		"Running the ouput of this compilation is undefined.", QByteArray());
 	
-	delete archive;
+	QString cachedResult = cachePath(name) + "/" + QFileInfo(firstTerminalFile).fileName();
 	
-	return compilation;
+	if(!QFile::remove(cachedResult) || !QFile::copy(firstTerminalFile, cachedResult)) {
+		ret << OutputList() << Output(programSavePath(name), 1,
+			QByteArray(), ("error: Failed to copy \"" + firstTerminalFile
+			+ "\" to \"" + cachedResult + "\"").toLatin1());
+	}
+	
+	m_compileResults[name] = cachedResult;
+	return ret;
 }
 
-const bool MainWindow::download(const QString& name, TinyArchive *archive)
+const bool MainWindow::download(const QString& name, const Kiss::KarPtr& archive)
 {
-	extendTimeout();
-	m_compileResults.remove(name);
-	QFile saveFile(programSavePath(name));
-	if(!saveFile.open(QIODevice::WriteOnly)) return false;
-	QTinyArchiveStream out(&saveFile);
-	archive->write(&out);
-	saveFile.close();
-	return true;
+	return archive->save(programSavePath(name));
 }
 
 Filesystem *MainWindow::filesystem()
@@ -176,7 +217,7 @@ Filesystem *MainWindow::filesystem()
 
 QStringList MainWindow::list() const
 {
-	//return m_filesystem.entries(QDir::Files | QDir::NoDot | QDir::NoDotDot);
+	
 	return QStringList();
 }
 
@@ -382,8 +423,13 @@ void MainWindow::updateSettings()
 	
 	settings.beginGroup(STORAGE);
 	QString path = settings.value(PROGRAM_DIRECTORY, QDir::homePath() + "/" + tr("KISS Programs")).toString();
-	QDir pathDir(path);
-	if(!pathDir.exists()) QDir().mkpath(path);
+	QString workPath = settings.value(WORKING_DIRECTORY, QDir::homePath() + "/" + tr("KISS Work Dir")).toString();
+
+	if(!QDir(path).exists()) QDir().mkpath(path);
+	
+	m_workingDirectory = QDir(workPath);
+	if(!m_workingDirectory.exists()) QDir().mkpath(workPath);
+	
 	m_filesystemModel->setRootPath(path);
 	ui->programList->setRootIndex(m_filesystemModel->index(path));
 	settings.endGroup();
@@ -396,17 +442,27 @@ QString MainWindow::displayName()
 	QSettings settings;
 	settings.beginGroup(KISS_CONNECTION);
 	settings.beginGroup(DISPLAY_NAME);
-	if(settings.value(DEFAULT).toBool())
-		ret = QUserInfo::username() + "'s Computer";
-	else
-		ret = settings.value(CUSTOM_NAME).toString();
+	if(settings.value(DEFAULT).toBool()) ret = QUserInfo::username() + "'s Computer";
+	else ret = settings.value(CUSTOM_NAME).toString();
 	settings.endGroup();
 	settings.endGroup();
 	
 	return ret;
 }
 
+QString MainWindow::tempPath() const
+{
+	return QDir::tempPath() + "/" + QDateTime::currentDateTime().toString("yyMMddhhmmss") + ".computer";
+}
+
+QString MainWindow::cachePath(const QString& name) const
+{
+	QString ret = programSavePath(name) + ".cache";
+	QDir().mkpath(ret);
+	return ret;
+}
+
 QString MainWindow::programSavePath(const QString& name) const
 {
-	return QDir(m_filesystemModel->rootPath()).filePath(name + ".kissproj");
+	return QDir(m_filesystemModel->rootPath()).filePath(name + ".kar");
 }

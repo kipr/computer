@@ -1,20 +1,20 @@
 #ifndef _MAINWINDOW_H_
 #define _MAINWINDOW_H_
 
+#include <easydevice/server.hpp>
+#include <easydevice/discovery_client.hpp>
+#include <easydevice/server_delegate.hpp>
+#include <easydevice/filesystem.hpp>
+#include <easydevice/password_generator.hpp>
+
+#include "SettingsDialog.h"
+
 #include <QMainWindow>
 #include <QPrinter>
 #include <QTime>
 #include <QItemSelection>
 #include <QTimer>
-
-#include <easydevice/Server.h>
-#include <easydevice/DiscoveryClient.h>
-#include <easydevice/ServerDelegate.h>
-#include <easydevice/Filesystem.h>
-#include <easydevice/PasswordGenerator.h>
-#include <kiss-compiler/Compilation.h>
-
-#include "SettingsDialog.h"
+#include <QDir>
 
 namespace Ui
 {
@@ -32,8 +32,8 @@ public:
 	~MainWindow();
 	
 	const bool run(const QString& name);
-	CompilationPtr compile(const QString& name);
-	const bool download(const QString& name, TinyArchive *archive);
+	Compiler::OutputList compile(const QString& name);
+	const bool download(const QString& name, const Kiss::KarPtr& archive);
 	EasyDevice::Filesystem *filesystem();
 	
 	QStringList list() const;
@@ -68,13 +68,15 @@ private:
 	void killProcess();
 	void updateSettings();
 	QString displayName();
+	QString tempPath() const;
+	QString cachePath(const QString& name) const;
 	QString programSavePath(const QString& name) const;
 
 	EasyDevice::Server m_server;
 	EasyDevice::DiscoveryClient m_discovery;
 	
 	EasyDevice::Filesystem m_filesystem;
-	QMap<QString, QStringList> m_compileResults;
+	QMap<QString, QString> m_compileResults;
 	
 	QDir m_workingDirectory;
 

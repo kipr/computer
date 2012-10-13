@@ -16,6 +16,7 @@
 #define TIMEOUT "timeout"
 #define STORAGE "storage"
 #define PROGRAM_DIRECTORY "programdir"
+#define WORKING_DIRECTORY "workdir"
 #define CONSOLE
 #define MAXIMUM_SCROLLBACK "maxscrollback"
 
@@ -36,6 +37,7 @@ public:
 private slots:
 	void on_defaultButton_clicked();
 	void on_programDirectoryBrowse_clicked();
+	void on_workingDirectoryBrowse_clicked();
 	
 private:
 	Ui::SettingsDialog *ui;

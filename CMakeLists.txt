@@ -47,7 +47,7 @@ ENDIF()
 
 SET(EXECUTABLE_OUTPUT_PATH ${computer_SOURCE_DIR}/deploy)
 SET(LIBRARY_OUTPUT_PATH ${computer_SOURCE_DIR}/lib)
-TARGET_LINK_LIBRARIES(computer ${QT_LIBRARIES} qscintilla2 kiss-compiler easydevice tinyarchive z)
+TARGET_LINK_LIBRARIES(computer ${QT_LIBRARIES} qscintilla2 pcompiler easydevice kar)
 
 macro(copy_files FILES DESTINATION)
   add_custom_target(copy ALL

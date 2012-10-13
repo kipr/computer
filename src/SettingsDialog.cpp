@@ -46,6 +46,15 @@ void SettingsDialog::on_programDirectoryBrowse_clicked()
 	ui->programDirectory->setText(path);
 }
 
+void SettingsDialog::on_workingDirectoryBrowse_clicked()
+{
+	QString path = ui->workingDirectory->text();
+	path = QFileDialog::getExistingDirectory(this, "Choose Working Directory", path);
+	if(path.isEmpty()) return;
+	ui->workingDirectory->setText(path);
+}
+
+
 void SettingsDialog::readSettings()
 {
 	QSettings settings;
@@ -71,6 +80,7 @@ void SettingsDialog::readSettings()
 	
 	settings.beginGroup(STORAGE);
 	ui->programDirectory->setText(settings.value(PROGRAM_DIRECTORY, QDir::homePath() + "/" + tr("KISS Programs")).toString());
+	ui->workingDirectory->setText(settings.value(WORKING_DIRECTORY, QDir::homePath() + "/" + tr("KISS Work Dir")).toString());
 	settings.endGroup();
 }
 
