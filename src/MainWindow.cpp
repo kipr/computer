@@ -65,7 +65,7 @@ MainWindow::MainWindow(QWidget *parent)
 	else ui->statusbar->showMessage("Error listening for incoming connections", 0);
 	
 	m_filesystemModel->setFilter(QDir::NoDot | QDir::NoDotDot | QDir::Files);
-	m_filesystemModel->setNameFilters(QStringList() << "*.kar");
+	m_filesystemModel->setNameFilters(QStringList() << "*.kissar");
 	ui->programWidget->hide();
 	ui->programList->setModel(m_filesystemModel);
 	
@@ -172,7 +172,10 @@ Compiler::OutputList MainWindow::compile(const QString& name)
 	}
 	Input input = Input::fromList(extractedFiles);
 	Engine engine(Compilers::instance()->compilers());
-	OutputList ret = engine.compile(input, Options::load(":/platform.hints"));
+	Options opts = Options::load(QDir::current().filePath("platform.hints"));
+	opts.replace("${PREFIX}", QDir::currentPath() + "/prefix");
+	qDebug() << "Building with" << opts;
+	OutputList ret = engine.compile(input, opts);
 	Cleaner cleaner(path);
 	unsigned int terminals = 0;
 	QString firstTerminalFile;
@@ -184,18 +187,27 @@ Compiler::OutputList MainWindow::compile(const QString& name)
 		}
 		success &= out.exitCode() == 0 && out.error().isEmpty();
 	}
-	if(success && !terminals) {
-		ret << OutputList() << Output(programSavePath(name), 1,
-		QByteArray(), "error: No terminals detected from compilation.");
+	
+	QFile::remove(m_compileResults.value(name));
+	
+	if(!success) {
 		return ret;
 	}
-	if(success && terminals > 1) ret << Output(programSavePath(name), 0,
-		"warning: Terminal ambiguity in compilation. " 
-		"Running the ouput of this compilation is undefined.", QByteArray());
+	
+	if(!terminals) {
+		ret << OutputList() << Output(programSavePath(name), 1,
+			QByteArray(), "error: No terminals detected from compilation.");
+		return ret;
+	}
+	if(terminals > 1) {
+		ret << Output(programSavePath(name), 0,
+			"warning: Terminal ambiguity in compilation. " 
+			"Running the ouput of this compilation is undefined.", QByteArray());
+	}
 	
 	QString cachedResult = cachePath(name) + "/" + QFileInfo(firstTerminalFile).fileName();
 	
-	if(!QFile::remove(cachedResult) || !QFile::copy(firstTerminalFile, cachedResult)) {
+	if(!QFile::copy(firstTerminalFile, cachedResult)) {
 		ret << OutputList() << Output(programSavePath(name), 1,
 			QByteArray(), ("error: Failed to copy \"" + firstTerminalFile
 			+ "\" to \"" + cachedResult + "\"").toLatin1());
@@ -464,5 +476,5 @@ QString MainWindow::cachePath(const QString& name) const
 
 QString MainWindow::programSavePath(const QString& name) const
 {
-	return QDir(m_filesystemModel->rootPath()).filePath(name + ".kar");
+	return QDir(m_filesystemModel->rootPath()).filePath(name + ".kissar");
 }
