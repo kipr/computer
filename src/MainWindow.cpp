@@ -172,7 +172,7 @@ Compiler::OutputList MainWindow::compile(const QString& name)
 	}
 	Input input = Input::fromList(extractedFiles);
 	Engine engine(Compilers::instance()->compilers());
-	Options opts = Options::load(QDir::current().filePath("platform.hints"));
+	Options opts = Options::load(QDir::current().filePath(":/platform/platform.hints"));
 	opts.replace("${PREFIX}", QDir::currentPath() + "/prefix");
 	qDebug() << "Building with" << opts;
 	OutputList ret = engine.compile(input, opts);
