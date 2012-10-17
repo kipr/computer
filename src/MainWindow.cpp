@@ -172,7 +172,7 @@ Compiler::OutputList MainWindow::compile(const QString& name)
 	}
 	Input input = Input::fromList(extractedFiles);
 	Engine engine(Compilers::instance()->compilers());
-	Options opts = Options::load(QDir::current().filePath(":/platform/platform.hints"));
+	Options opts = Options::load(QDir::current().filePath("platform.hints"));
 	opts.replace("${PREFIX}", QDir::currentPath() + "/prefix");
 	qDebug() << "Building with" << opts;
 	OutputList ret = engine.compile(input, opts);
@@ -206,7 +206,7 @@ Compiler::OutputList MainWindow::compile(const QString& name)
 	}
 	
 	QString cachedResult = cachePath(name) + "/" + QFileInfo(firstTerminalFile).fileName();
-	
+	QFile::remove(cachedResult);
 	if(!QFile::copy(firstTerminalFile, cachedResult)) {
 		ret << OutputList() << Output(programSavePath(name), 1,
 			QByteArray(), ("error: Failed to copy \"" + firstTerminalFile
