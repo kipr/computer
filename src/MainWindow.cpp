@@ -106,6 +106,7 @@ const bool MainWindow::run(const QString& name)
 	QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
 	// TODO: This will only work on OS X
 	env.insert("DYLD_LIBRARY_PATH", QDir::currentPath() + "/prefix/usr/lib:" + env.value("DYLD_LIBRARY_PATH"));
+	env.insert("DYLD_LIBRARY_PATH", QDir::currentPath() + "/prefix/usr:" + env.value("DYLD_LIBRARY_PATH"));
 	m_process->setProcessEnvironment(env);
 	m_process->setWorkingDirectory(m_workingDirectory.path());
 	ui->console->setProcess(m_process);

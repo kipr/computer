@@ -1,7 +1,7 @@
 [General]
 C_FLAGS = -std=c99 -Wall -I${PREFIX}/usr/include -include stdio.h -include kiss/kiss.h -include blobtastic/blobtastic.h -include target.h -g
 CXX_FLAGS = -Wall -I${PREFIX}/usr/include -include stdio.h -include kiss/kiss.h -include blobtastic/blobtastic.hpp -include target.h -g
-LD_FLAGS = -L${PREFIX}/usr/lib -lkiss2 -lglfw -lblobtastic
+LD_FLAGS = -L${PREFIX}/usr/lib -lkiss2 -lblobtastic
 
 [osx]
 LD_FLAGS = -framework OpenGL -framework CoreFoundation -framework IOKit -framework Cocoa
