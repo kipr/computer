@@ -28,6 +28,11 @@ QT4_WRAP_CPP(computer_SRCS_CXX ${computer_MOC_SRCS})
 QT4_WRAP_UI(computer_SRCS_CXX ${computer_UI})
 QT4_ADD_RESOURCES(computer_SRCS_CXX ${computer_QRC_FILES})
 
+IF(WIN32)
+INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/../prefix/include)
+LINK_DIRECTORIES(${CMAKE_SOURCE_DIR}/../prefix/lib)
+ENDIF(WIN32)
+
 SET(CMAKE_CXX_FLAGS "-Wall")
 
 IF(APPLE)
