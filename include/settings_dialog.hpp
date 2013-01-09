@@ -1,5 +1,5 @@
-#ifndef SETTINGSDIALOG_H
-#define SETTINGSDIALOG_H
+#ifndef _SETTINGS_DIALOG_HPP_
+#define _SETTINGS_DIALOG_HPP_
 
 #include <QDialog>
 

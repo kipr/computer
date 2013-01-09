@@ -1,4 +1,4 @@
-#include "QUserInfo.h"
+#include "quser_info.hpp"
 
 #ifdef Q_OS_WIN
 #include <windows.h>

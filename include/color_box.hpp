@@ -1,5 +1,5 @@
-#ifndef _COLORBOX_H_
-#define _COLORBOX_H_
+#ifndef _COLOR_BOX_HPP_
+#define _COLOR_BOX_HPP_
 
 #include <QLineEdit>
 

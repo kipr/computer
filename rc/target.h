@@ -9,7 +9,7 @@ extern "C" {
 // This sets flush after every write, which is unfortunately slower.
 __attribute__((constructor))
 void __set_no_stdout_buffer() {
-    setvbuf(stdout, (char*) NULL, _IONBF, 0);
+    setvbuf(stdout, (char *)NULL, _IONBF, 0);
 }
 
 #ifdef __cplusplus

@@ -12,11 +12,9 @@ SET(UI ${computer_SOURCE_DIR}/ui)
 INCLUDE_DIRECTORIES(${computer_BINARY_DIR})
 INCLUDE_DIRECTORIES(${INCLUDE})
 
-SET(QT_USE_QTNETWORK TRUE)
-
 INCLUDE(${QT_USE_FILE})
 
-FILE(GLOB INCLUDES ${INCLUDE}/*.h)
+FILE(GLOB INCLUDES ${INCLUDE}/*.hpp)
 FILE(GLOB SOURCES ${SRC}/*)
 FILE(GLOB UIS ${UI}/*)
 
@@ -47,7 +45,7 @@ ENDIF()
 
 SET(EXECUTABLE_OUTPUT_PATH ${computer_SOURCE_DIR}/deploy)
 SET(LIBRARY_OUTPUT_PATH ${computer_SOURCE_DIR}/lib)
-TARGET_LINK_LIBRARIES(computer ${QT_LIBRARIES} qscintilla2 pcompiler easydevice kar)
+TARGET_LINK_LIBRARIES(computer ${QT_LIBRARIES} pcompiler kovanserial kar)
 
 macro(copy_files NAME FILES DESTINATION)
   add_custom_target(copy_${NAME} ALL
@@ -65,11 +63,11 @@ macro(copy_files NAME FILES DESTINATION)
 endmacro(copy_files)
 
 IF(APPLE)
-copy_files(target ${RC}/target.h ${computer_SOURCE_DIR}/deploy/computer.app/Contents/prefix/usr/include)
-copy_files(platform.hints ${RC}/platform.hints ${computer_SOURCE_DIR}/deploy/computer.app/Contents)
+	copy_files(target ${RC}/target.h ${computer_SOURCE_DIR}/deploy/computer.app/Contents/prefix/usr/include)
+	copy_files(platform.hints ${RC}/platform.hints ${computer_SOURCE_DIR}/deploy/computer.app/Contents)
 ELSE(APPLE)
-copy_files(target ${RC}/target.h ${computer_SOURCE_DIR}/deploy/prefix/usr/include)
-copy_files(platform.hints ${RC}/platform.hints ${computer_SOURCE_DIR}/deploy)
+	copy_files(target ${RC}/target.h ${computer_SOURCE_DIR}/deploy/prefix/usr/include)
+	copy_files(platform.hints ${RC}/platform.hints ${computer_SOURCE_DIR}/deploy)
 ENDIF(APPLE)
 
 

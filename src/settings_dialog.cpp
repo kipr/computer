@@ -1,5 +1,5 @@
-#include "SettingsDialog.h"
-#include "ui_SettingsDialog.h"
+#include "settings_dialog.hpp"
+#include "ui_settings_dialog.h"
 
 #include <QSettings>
 #include <QColor>
@@ -41,7 +41,7 @@ void SettingsDialog::on_defaultButton_clicked()
 void SettingsDialog::on_programDirectoryBrowse_clicked()
 {
 	QString path = ui->programDirectory->text();
-	path = QFileDialog::getExistingDirectory(this, "Choose Program Directory", path);
+	path = QFileDialog::getExistingDirectory(this, tr("Choose Program Directory"), path);
 	if(path.isEmpty()) return;
 	ui->programDirectory->setText(path);
 }
@@ -49,7 +49,7 @@ void SettingsDialog::on_programDirectoryBrowse_clicked()
 void SettingsDialog::on_workingDirectoryBrowse_clicked()
 {
 	QString path = ui->workingDirectory->text();
-	path = QFileDialog::getExistingDirectory(this, "Choose Working Directory", path);
+	path = QFileDialog::getExistingDirectory(this, tr("Choose Working Directory"), path);
 	if(path.isEmpty()) return;
 	ui->workingDirectory->setText(path);
 }

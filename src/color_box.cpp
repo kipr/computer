@@ -1,5 +1,5 @@
-#include "ColorBox.h"
-#include <QDebug>
+#include "color_box.hpp"
+
 #include <QColorDialog>
 
 ColorBox::ColorBox(QWidget *parent)
@@ -29,5 +29,6 @@ void ColorBox::setColor(QColor color)
 void ColorBox::mouseDoubleClickEvent(QMouseEvent *event)
 {
 	QColorDialog diag;
-	if(diag.exec()) setColor(diag.selectedColor());
+	if(!diag.exec()) return;
+	setColor(diag.selectedColor());
 }

@@ -1,5 +1,5 @@
-#ifndef _QUSERINFO_H_
-#define _QUSERINFO_H_
+#ifndef _QUSER_INFO_HPP_
+#define _QUSER_INFO_HPP_
 
 #include <QString>
 

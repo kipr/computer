@@ -1,5 +1,5 @@
-#ifndef _CONSOLEWIDGET_H_
-#define _CONSOLEWIDGET_H_
+#ifndef _CONSOLE_WIDGET_HPP_
+#define _CONSOLE_WIDGET_HPP_
 
 #include <QTextEdit>
 #include <QProcess>

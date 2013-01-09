@@ -1,7 +1,7 @@
-#ifndef COMPUTER_H
-#define COMPUTER_H
+#ifndef _COMPUTER_HPP_
+#define _COMPUTER_HPP_
 
 #define COMPUTER_VERSION_MAJOR 0
 #define COMPUTER_VERSION_MINOR 1
 
-#endif // COMPUTER_H
+#endif
