@@ -11,6 +11,7 @@ class KovanSerial;
 
 class CompileWorker : public QThread, public Compiler::Progress
 {
+Q_OBJECT
 public:
 	CompileWorker(const Kiss::KarPtr &archive, KovanSerial *proto, QObject *parent = 0);
 	
