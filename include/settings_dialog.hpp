@@ -19,6 +19,9 @@
 #define WORKING_DIRECTORY "workdir"
 #define CONSOLE
 #define MAXIMUM_SCROLLBACK "maxscrollback"
+#define SECURITY_GROUP "security"
+#define SECURITY_PASSWORD "password"
+#define SECURITY_ENABLED "enabled"
 
 namespace Ui {
 class SettingsDialog;
@@ -34,8 +37,11 @@ public:
 	
 	int exec();
 	
-private slots:
+private Q_SLOTS:
 	void on_defaultButton_clicked();
+	void on_noneCheck_clicked();
+	void on_passwordCheck_clicked();
+	void on_password_textChanged(const QString &password);
 	void on_programDirectoryBrowse_clicked();
 	void on_workingDirectoryBrowse_clicked();
 	

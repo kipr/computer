@@ -34,11 +34,9 @@ private slots:
 	void about();
 	void settings();
 	void openWorkingDir();
+	void vision();
 	
 	void run(const QString &executable);
-	
-	void timeout();
-	void extendTimeout();
 	
 	void processStarted();
 	void processFinished();
@@ -64,7 +62,6 @@ private:
 	Ui::MainWindow *ui;
 	
 	QByteArray m_hash;
-	QTimer m_timer;
 	QTime m_time;
 	
 	QFileSystemModel *m_filesystemModel;

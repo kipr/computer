@@ -27,20 +27,20 @@ MainWindow::MainWindow(QWidget *parent)
 	: QMainWindow(parent),
 	m_process(0),
 	ui(new Ui::MainWindow),
-	m_timer(this),
 	m_heartbeat(new Heartbeat(this)),
 	m_server(0)
 {
 	ui->setupUi(this);
 	setWindowTitle(QUserInfo::username() + "'s Computer");
 	
-	connect(ui->actionPrint, SIGNAL(activated()), this, SLOT(print()));
-	connect(ui->actionSave, SIGNAL(activated()), this, SLOT(saveToFile()));
-	connect(ui->actionCopy, SIGNAL(activated()), this, SLOT(copy()));
-	connect(ui->actionStop, SIGNAL(activated()), this, SLOT(terminateProcess()));
-	connect(ui->actionAbout, SIGNAL(activated()), this, SLOT(about()));
-	connect(ui->actionSettings, SIGNAL(activated()), this, SLOT(settings()));
-	connect(ui->actionOpenWorkingDirectory, SIGNAL(activated()), this, SLOT(openWorkingDir()));
+	connect(ui->actionPrint, SIGNAL(activated()), SLOT(print()));
+	connect(ui->actionSave, SIGNAL(activated()), SLOT(saveToFile()));
+	connect(ui->actionCopy, SIGNAL(activated()), SLOT(copy()));
+	connect(ui->actionStop, SIGNAL(activated()), SLOT(terminateProcess()));
+	connect(ui->actionAbout, SIGNAL(activated()), SLOT(about()));
+	connect(ui->actionSettings, SIGNAL(activated()), SLOT(settings()));
+	connect(ui->actionOpenWorkingDirectory, SIGNAL(activated()), SLOT(openWorkingDir()));
+	connect(ui->actionVision, SIGNAL(activated()), SLOT(vision()));
 	connect(ui->console, SIGNAL(abortRequested()), this, SLOT(terminateProcess()));
 	
 	TcpServer *serial = new TcpServer;
@@ -54,8 +54,6 @@ MainWindow::MainWindow(QWidget *parent)
 	updateSettings();
 	
 	updateAdvert();
-	
-	connect(&m_timer, SIGNAL(timeout()), this, SLOT(timeout()));
 }
 
 MainWindow::~MainWindow()
@@ -78,13 +76,15 @@ void MainWindow::print()
 
 void MainWindow::saveToFile()
 {
-	QString fileName = QFileDialog::getSaveFileName(this, tr("Save"), QString(), tr("Text files (*.txt);;All files (*)"));
+	QString fileName = QFileDialog::getSaveFileName(this, tr("Save"), QString(),
+		tr("Text files (*.txt);;All files (*)"));
 	if(fileName.isEmpty())
 		return;
 	
 	QFile file(fileName);
 	if(!file.open(QFile::WriteOnly | QFile::Text)) {
-		QMessageBox::warning(this, tr("Error"), tr("Cannot write to file %1:\n%2.").arg(fileName).arg(file.errorString()));
+		QMessageBox::warning(this, tr("Error"), tr("Cannot write to file %1:\n%2.").arg(fileName)
+			.arg(file.errorString()));
 		return;
 	}
 
@@ -108,7 +108,8 @@ void MainWindow::about()
 	QString aboutMessage;
 	aboutMessage += "Copyright (C) 2012 KISS Institute for Practical Robotics\n\n";
 	aboutMessage += "Developed by Braden McDorman and Nafis Zaman\n\n";
-	aboutMessage += "Version " + QString::number(COMPUTER_VERSION_MAJOR) + "." + QString::number(COMPUTER_VERSION_MINOR);
+	aboutMessage += "Version " + QString::number(COMPUTER_VERSION_MAJOR) + "."
+		+ QString::number(COMPUTER_VERSION_MINOR);
 	QMessageBox::about(this, "About Computer", aboutMessage);
 }
 
@@ -121,6 +122,11 @@ void MainWindow::openWorkingDir()
 {
 	QString path = QDir::toNativeSeparators(m_workingDirectory.absolutePath());
 	QDesktopServices::openUrl(QUrl("file:///" + path));
+}
+
+void MainWindow::vision()
+{
+	
 }
 
 void MainWindow::run(const QString &executable)
@@ -140,19 +146,6 @@ void MainWindow::run(const QString &executable)
 	processStarted();
 	m_process->start(executable, QStringList());
 	raise();
-	extendTimeout();
-}
-
-void MainWindow::timeout()
-{
-	ui->statusbar->showMessage("A command has not been sent in a while. Relocking.", 0);
-}
-
-void MainWindow::extendTimeout()
-{
-	QSettings settings;
-	settings.beginGroup(KISS_CONNECTION);
-	m_timer.start(settings.value(TIMEOUT).toInt() * 60000);
 }
 
 void MainWindow::processStarted()
@@ -215,17 +208,27 @@ void MainWindow::updateSettings()
 	ui->console->setPlainText(contents);
 	
 	settings.beginGroup(STORAGE);
-	QString workPath = settings.value(WORKING_DIRECTORY, QDir::homePath() + "/" + tr("KISS Work Dir")).toString();
+	QString workPath = settings.value(WORKING_DIRECTORY, QDir::homePath() + "/"
+		+ tr("KISS Work Dir")).toString();
 	
 	m_workingDirectory = QDir(workPath);
 	if(!m_workingDirectory.exists()) QDir().mkpath(workPath);
+	
+	QString progPath = settings.value(PROGRAM_DIRECTORY, QDir::homePath() + "/"
+		+ tr("KISS Programs")).toString();
+	
+	QDir prog(progPath);
+	prog.makeAbsolute();
+	if(!prog.exists()) QDir().mkpath(prog.absolutePath());
+	m_server->setUserRoot(prog.path());
 	
 	settings.endGroup();
 }
 
 void MainWindow::updateAdvert()
 {
-	QString version = (QString::number(COMPUTER_VERSION_MAJOR) + "." + QString::number(COMPUTER_VERSION_MINOR));
+	QString version = (QString::number(COMPUTER_VERSION_MAJOR) + "."
+		+ QString::number(COMPUTER_VERSION_MINOR));
 	#if defined(Q_OS_WIN)
 	version += " for Windows";
 	#elif defined(Q_OS_MAC)

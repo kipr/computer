@@ -18,9 +18,12 @@ public:
 	void run();
 	
 	const Compiler::OutputList &output() const;
-	const QString &resultPath() const;
+	void setUserRoot(const QString &userRoot);
+	const QString &userRoot() const;
 	
 	void progress(double fraction);
+	
+	void cleanup();
 	
 private:
 	
@@ -30,7 +33,8 @@ private:
 	Kiss::KarPtr m_archive;
 	KovanSerial *m_proto;
 	Compiler::OutputList m_output;
-	QString m_resultPath;
+	QString m_userRoot;
+	QString m_tempDir;
 };
 
 #endif

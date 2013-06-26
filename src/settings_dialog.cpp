@@ -38,6 +38,28 @@ void SettingsDialog::on_defaultButton_clicked()
 	readSettings();
 }
 
+void SettingsDialog::on_noneCheck_clicked()
+{
+	ui->password->setText(QString());
+	ui->password->setEnabled(false);
+	
+	QPushButton *button = ui->buttons->button(QDialogButtonBox::Ok);
+	if(!button) return;
+	button->setEnabled(true);
+}
+
+void SettingsDialog::on_passwordCheck_clicked()
+{
+	ui->password->setEnabled(true);
+}
+
+void SettingsDialog::on_password_textChanged(const QString &password)
+{
+	QPushButton *button = ui->buttons->button(QDialogButtonBox::Ok);
+	if(!button) return;
+	button->setEnabled(!password.isEmpty());
+}
+
 void SettingsDialog::on_programDirectoryBrowse_clicked()
 {
 	QString path = ui->programDirectory->text();
@@ -74,13 +96,22 @@ void SettingsDialog::readSettings()
 	ui->customDisplayNameButton->setChecked(!def);
 	ui->customDisplayNameEdit->setText(settings.value(CUSTOM_NAME, "").toString());
 	settings.endGroup();
-	ui->timeoutBox->setValue(settings.value(TIMEOUT, 5).toInt());
-	ui->disallowRemoteBox->setChecked(settings.value(DISALLOW_REMOTE, false).toBool());
+	settings.beginGroup(SECURITY_GROUP);
+	const bool enabled = settings.value(SECURITY_ENABLED, false).toBool();
+	ui->passwordCheck->setChecked(enabled);
+	if(enabled) ui->passwordCheck->click();
+	else ui->noneCheck->click();
+	ui->password->setText(settings.value(SECURITY_PASSWORD).toString());
+	
+	
+	settings.endGroup();
 	settings.endGroup();
 	
 	settings.beginGroup(STORAGE);
-	ui->programDirectory->setText(settings.value(PROGRAM_DIRECTORY, QDir::homePath() + "/" + tr("KISS Programs")).toString());
-	ui->workingDirectory->setText(settings.value(WORKING_DIRECTORY, QDir::homePath() + "/" + tr("KISS Work Dir")).toString());
+	ui->programDirectory->setText(settings.value(PROGRAM_DIRECTORY, QDir::homePath() + "/"
+		+ tr("KISS Programs")).toString());
+	ui->workingDirectory->setText(settings.value(WORKING_DIRECTORY, QDir::homePath() + "/"
+		+ tr("KISS Work Dir")).toString());
 	settings.endGroup();
 }
 
@@ -102,8 +133,10 @@ void SettingsDialog::saveSettings()
 	settings.setValue(DEFAULT, defaultChecked);
 	settings.setValue(CUSTOM_NAME, ui->customDisplayNameEdit->text());
 	settings.endGroup();
-	settings.setValue(TIMEOUT, ui->timeoutBox->value());
-	settings.setValue(DISALLOW_REMOTE, ui->disallowRemoteBox->isChecked());
+	settings.beginGroup(SECURITY_GROUP);
+	settings.setValue(SECURITY_ENABLED, ui->passwordCheck->isChecked());
+	settings.setValue(SECURITY_PASSWORD, ui->password->text());
+	settings.endGroup();
 	settings.endGroup();
 	
 	settings.beginGroup(STORAGE);

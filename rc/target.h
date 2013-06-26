@@ -1,6 +1,8 @@
 #ifndef _TARGET_H_
 #define _TARGET_H_
 
+#include "stdio.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif

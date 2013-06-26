@@ -36,7 +36,7 @@ ENDIF(WIN32)
 SET(CMAKE_CXX_FLAGS "-Wall")
 
 IF(APPLE)
-	SET(CMAKE_OSX_SYSROOT "${OSX_DEVELOPER_ROOT}/SDKs/MacOSX10.6.sdk")
+	# SET(CMAKE_OSX_SYSROOT "${OSX_DEVELOPER_ROOT}/SDKs/MacOSX10.6.sdk")
 	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -arch x86_64 -g")
 	LINK_DIRECTORIES(/Library/Frameworks/)
 	ADD_EXECUTABLE(computer MACOSX_BUNDLE ${computer_SRCS_CXX})
@@ -50,7 +50,7 @@ ENDIF()
 
 SET(EXECUTABLE_OUTPUT_PATH ${computer_SOURCE_DIR}/deploy)
 SET(LIBRARY_OUTPUT_PATH ${computer_SOURCE_DIR}/lib)
-TARGET_LINK_LIBRARIES(computer ${QT_LIBRARIES} pcompiler kovanserial kar)
+TARGET_LINK_LIBRARIES(computer ${QT_LIBRARIES} pcompiler kovanserial kar kovan)
 
 macro(copy_files NAME FILES DESTINATION)
   add_custom_target(copy_${NAME} ALL
