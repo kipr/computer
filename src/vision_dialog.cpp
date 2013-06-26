@@ -80,6 +80,7 @@ VisionDialog::VisionDialog(QWidget *parent)
 	, m_configsModel(new ChannelConfigurationsModel(this))
 	, m_configModel(new CameraConfigModel(this))
 	, m_device(new Camera::Device(new Camera::UsbInputProvider))
+	, m_ignoreNextConfigSave(false)
 {
 	ui->setupUi(this);
 	
@@ -115,11 +116,11 @@ VisionDialog::VisionDialog(QWidget *parent)
 	
 	connect(ui->channels->selectionModel(),
 		SIGNAL(selectionChanged(QItemSelection, QItemSelection)),
-		SLOT(updateOptions()));
+		SLOT(updateOptions(QItemSelection, QItemSelection)));
 	
 	connect(ui->configs->selectionModel(),
 		SIGNAL(currentChanged(QModelIndex, QModelIndex)),
-		SLOT(currentConfigChanged(QModelIndex)));
+		SLOT(currentConfigChanged(QModelIndex, QModelIndex)));
 		
 	m_defaultPath = m_configsModel->filePath(m_configsModel->defaultConfiguration());
 }
@@ -156,6 +157,7 @@ void VisionDialog::updateCamera()
 	if(image.empty()) {
 		qDebug() << "Empty???";
 	}
+	
 	for(; it != objs->end(); ++it) {
 		const Camera::Object &obj = *it;
 		cv::rectangle(image, cv::Rect(obj.boundingBox().x(), obj.boundingBox().y(),
@@ -172,13 +174,17 @@ int VisionDialog::exec()
 	
 	int ret = QDialog::exec();
 	m_device->close();
+	
+	QItemSelection selection = ui->configs->selectionModel()->selection();
+	if(selection.indexes().size())
+		currentConfigChanged(QModelIndex(), selection.indexes()[0]);
+	
 	return ret;
 }
 
 void VisionDialog::on_addChannel_clicked()
 {
 	m_configModel->addChannel(CAMERA_CHANNEL_TYPE_HSV_KEY);
-	updateOptions();
 }
 
 void VisionDialog::on_removeChannel_clicked()
@@ -187,7 +193,6 @@ void VisionDialog::on_removeChannel_clicked()
 		->selection().indexes();
 	if(indexes.size() != 1) return;
 	m_configModel->removeChannel(indexes[0].row());
-	updateOptions();
 }
 
 void VisionDialog::on_up_clicked()
@@ -216,18 +221,34 @@ void VisionDialog::on_down_clicked()
 		QItemSelectionModel::Select);
 }
 
-void VisionDialog::updateOptions()
+void VisionDialog::updateOptions(const QItemSelection &current, const QItemSelection &prev)
 {
-	const QModelIndexList &indexes = ui->channels->selectionModel()
-		->selection().indexes();
+	if(prev.indexes().size()) {
+		QModelIndex p = prev.indexes()[0];
+		Config c = m_configModel->config();
+		c.beginGroup(CAMERA_GROUP);
+		c.beginGroup(CAMERA_CHANNEL_GROUP_PREFIX + QString::number(p.row()).toStdString());
+		c.addValues(m_hsvConfig);
+		m_configModel->setConfig(c);
+		ui->channels->selectionModel()->select(current, QItemSelectionModel::Select);
+	}
+	
+	const QModelIndexList &indexes = current.indexes();
 	const bool enable = ui->channels->isEnabled();
 	const bool sel = indexes.size() == 1 && enable;
-	qDebug() << indexes.size();
 	ui->addChannel->setEnabled(enable);
 	ui->removeChannel->setEnabled(sel);
 	ui->up->setEnabled(sel && indexes[0].row() > 0);
 	ui->down->setEnabled(sel && indexes[0].row() + 1 < m_configModel->rowCount());
 	ui->hsv->setEnabled(sel);
+	
+	if(indexes.size()) {
+		Config c = m_configModel->config();
+		c.beginGroup(CAMERA_GROUP);
+		c.beginGroup((CAMERA_CHANNEL_GROUP_PREFIX + QString::number(indexes[0].row()))
+			.toStdString());
+		m_hsvConfig = c.values();
+	}
 	refreshHsv();
 }
 
@@ -397,11 +418,12 @@ void VisionDialog::on_renameConfig_clicked()
 	input.setValue(file.baseName());
 	input.setEmptyAllowed(false);
 	if(input.exec() != QDialog::Accepted) return;
+	
+	// Forgive me, programming gods
+	m_ignoreNextConfigSave = true;
 	if(!QFile::rename(file.filePath(),
 		file.path() + "/" + input.value() + "." + file.completeSuffix())) {
 		qWarning() << "Failed to change name";
-		// TODO: Make this error user visible
-		return;
 	}
 }
 
@@ -440,7 +462,7 @@ void VisionDialog::on_addConfig_clicked()
 		QModelIndex index = m_configsModel->index(qSavePath);
 		ui->configs->selectionModel()->select(index, QItemSelectionModel::Select);
 		on_defaultConfig_clicked();
-		currentConfigChanged(index);
+		currentConfigChanged(index, QModelIndex());
 	}
 }
 
@@ -448,28 +470,33 @@ void VisionDialog::on_removeConfig_clicked()
 {
 	QItemSelection selection = ui->configs->selectionModel()->selection();
 	if(selection.indexes().size() != 1) return;
+	// Forgive me, programming gods
+	m_ignoreNextConfigSave = true;
 	QFile::remove(m_configsModel->filePath(selection.indexes()[0]));
-	currentConfigChanged(QModelIndex());
 }
 
-void VisionDialog::currentConfigChanged(const QModelIndex &index)
+void VisionDialog::currentConfigChanged(const QModelIndex &current, const QModelIndex &prev)
 {
-	const bool enable = index.isValid();
+	if(prev.isValid() && !m_ignoreNextConfigSave) {
+		const Config c = m_configModel->config();
+		c.save(Camera::ConfigPath::path(m_configsModel->fileInfo(prev)
+					.baseName().toStdString()));
+		m_ignoreNextConfigSave = false;
+	}
+	
+	const bool enable = current.isValid();
 	ui->renameConfig->setEnabled(enable);
-	ui->defaultConfig->setEnabled(enable && !isDefaultPath(index));
+	ui->defaultConfig->setEnabled(enable && !isDefaultPath(current));
 	ui->removeConfig->setEnabled(enable);
 	ui->channels->setEnabled(enable);
 	if(enable) {
-		Config *config = Config::load(Camera::ConfigPath::path(m_configsModel->fileInfo(index)
+		Config *config = Config::load(Camera::ConfigPath::path(m_configsModel->fileInfo(current)
 			.baseName().toStdString()));
-		if(!config) {
-			ui->channels->setEnabled(enable);
-			return;
-		}
-		m_configModel->setConfig(*config);
+		if(config) m_configModel->setConfig(*config);
 		delete config;
 	} else {
 		m_configModel->setConfig(Config());
 	}
-	updateOptions();
+	
+	updateOptions(QItemSelection(), ui->channels->selectionModel()->selection());
 }

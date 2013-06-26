@@ -145,12 +145,34 @@ void MainWindow::run(const QString &executable)
 	env.insert("DYLD_LIBRARY_PATH", QDir::currentPath() + "/prefix/usr/lib:" + env.value("DYLD_LIBRARY_PATH"));
 	env.insert("DYLD_LIBRARY_PATH", QDir::currentPath() + "/prefix/usr:" + env.value("DYLD_LIBRARY_PATH"));
 #endif
+	env.insert("CAMERA_BASE_CONFIG_PATH", m_workingDirectory.filePath("vision"));
+	
+	
+	Compiler::RootManager root(m_server->userRoot());
+#ifdef Q_OS_MAC
+	env.insert("DYLD_LIBRARY_PATH", env.value("DYLD_LIBRARY_PATH") + ":"
+		+ root.libDirectories().join(":"));
+#elif defined(Q_OS_WIN)
+	env.inser
+#else
+	
+#endif
 	m_process->setProcessEnvironment(env);
 	m_process->setWorkingDirectory(m_workingDirectory.path());
 	ui->console->setProcess(m_process);
 	connect(m_process, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(processFinished()));
+	
+	qDebug() << "Started" << root.bin(executable).filePath(executable);
+	
+	m_process->start(root.bin(executable).filePath(executable), QStringList());
+	if(!m_process->waitForStarted(1000)) {
+		ui->console->append(tr("Failed to start %1").arg(executable));
+		return;
+	}
+	
+	
+	
 	processStarted();
-	m_process->start(executable, QStringList());
 	raise();
 }
 

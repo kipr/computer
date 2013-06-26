@@ -4,6 +4,7 @@
 #include <QDialog>
 #include <QTimer>
 #include <QModelIndex>
+#include <QItemSelection>
 
 #include <kovan/config.hpp>
 
@@ -45,12 +46,12 @@ private Q_SLOTS:
 	void visualChanged();
 	void imagePressed(const int x, const int y);
 	
-	void currentConfigChanged(const QModelIndex &);
+	void currentConfigChanged(const QModelIndex &current, const QModelIndex &prev);
+	void updateOptions(const QItemSelection &current, const QItemSelection &prev);
 	
 private:
 	void refreshHsv();
 	void blockChildSignals(const bool block);
-	void updateOptions();
 	
 	ChannelConfigurationsModel *m_configsModel;
 	CameraConfigModel *m_configModel;
@@ -61,6 +62,8 @@ private:
 	Camera::Device *m_device;
 	Config m_hsvConfig;
 	QString m_defaultPath;
+	
+	bool m_ignoreNextConfigSave;
 };
 
 #endif
