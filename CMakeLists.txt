@@ -50,7 +50,7 @@ ENDIF()
 
 SET(EXECUTABLE_OUTPUT_PATH ${computer_SOURCE_DIR}/deploy)
 SET(LIBRARY_OUTPUT_PATH ${computer_SOURCE_DIR}/lib)
-TARGET_LINK_LIBRARIES(computer ${QT_LIBRARIES} pcompiler kovanserial kar kovan)
+TARGET_LINK_LIBRARIES(computer ${QT_LIBRARIES} pcompiler kovanserial kar kovan opencv_core opencv_imgproc)
 
 macro(copy_files NAME FILES DESTINATION)
   add_custom_target(copy_${NAME} ALL

@@ -3,6 +3,8 @@
 
 #include <pcompiler/pcompiler.hpp>
 
+#include <kovan/camera.hpp>
+
 #include <kovanserial/kovan_serial.hpp>
 #include <kovanserial/tcp_server.hpp>
 
@@ -10,6 +12,7 @@
 #include "quser_info.hpp"
 #include "heartbeat.hpp"
 #include "server_thread.hpp"
+#include "vision_dialog.hpp"
 
 #include <QPrintDialog>
 #include <QFileDialog>
@@ -126,6 +129,9 @@ void MainWindow::openWorkingDir()
 
 void MainWindow::vision()
 {
+	VisionDialog dialog(this);
+	if(dialog.exec() != QDialog::Accepted) return;
+	
 	
 }
 
@@ -213,6 +219,8 @@ void MainWindow::updateSettings()
 	
 	m_workingDirectory = QDir(workPath);
 	if(!m_workingDirectory.exists()) QDir().mkpath(workPath);
+	
+	Camera::ConfigPath::setBasePath(m_workingDirectory.absoluteFilePath("vision").toStdString());
 	
 	QString progPath = settings.value(PROGRAM_DIRECTORY, QDir::homePath() + "/"
 		+ tr("KISS Programs")).toString();
