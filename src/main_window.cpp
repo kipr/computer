@@ -151,11 +151,12 @@ void MainWindow::run(const QString &executable)
 	Compiler::RootManager root(m_server->userRoot());
 #ifdef Q_OS_MAC
 	env.insert("DYLD_LIBRARY_PATH", env.value("DYLD_LIBRARY_PATH") + ":"
-		+ root.libDirectories().join(":"));
+		+ root.libDirectoryPaths().join(":"));
 #elif defined(Q_OS_WIN)
 	env.inser
 #else
-	
+	env.insert("LD_LIBRARY_PATH", env.value("LD_LIBRARY_PATH") + ":"
+		+ root.libDirectoryPaths().join(":"));
 #endif
 	m_process->setProcessEnvironment(env);
 	m_process->setWorkingDirectory(m_workingDirectory.path());
