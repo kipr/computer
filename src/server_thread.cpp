@@ -166,10 +166,8 @@ void ServerThread::handleAction(const Packet &action)
 			m_proto->sendFileActionProgress(true, 1.0);
 		}
 		
-		if(Output::isSuccess(output)) {
-			output << RootManager(m_userRoot).install(output, name);
-		}
-		
+		output << RootManager(m_userRoot).install(output, name);
+				
 		if(worker) worker->cleanup();
 		
 		QByteArray data;
