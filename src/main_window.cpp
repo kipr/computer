@@ -49,6 +49,7 @@ MainWindow::MainWindow(QWidget *parent)
 	TcpServer *serial = new TcpServer;
 	serial->bind(KOVAN_SERIAL_PORT);
 	serial->listen(2);
+	serial->setConnectionRestriction(TcpServer::OnlyLocal);
 	m_server = new ServerThread(serial);
 	connect(m_server, SIGNAL(run(QString)), SLOT(run(QString)));
 	m_server->setAutoDelete(true);

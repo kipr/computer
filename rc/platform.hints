@@ -1,6 +1,6 @@
 [General]
-C_FLAGS = -std=c99 -Wall \"-I${PREFIX}/usr/include\" -include kovan/kovan.h -include target.h -g -O3
-CXX_FLAGS = -Wall \"-I${PREFIX}/usr/include\" -include stdio.h -include kovan/kovan.hpp -include target.h -g -O3
+C_FLAGS = -std=c99 -Wall \"-I${PREFIX}/usr/include\" -include kovan/kovan.h -g -O3
+CXX_FLAGS = -Wall \"-I${PREFIX}/usr/include\" -include stdio.h -include kovan/kovan.hpp -g -O3
 LD_FLAGS = \"-L${PREFIX}/usr/lib\" -lkovan
 
 [osx]
