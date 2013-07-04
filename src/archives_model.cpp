@@ -3,6 +3,7 @@
 #include <QStandardItem>
 #include <QFileInfo>
 #include <QDir>
+#include <QFileSystemWatcher>
 
 class ArchiveItem : public QStandardItem
 {
@@ -25,7 +26,9 @@ private:
 
 ArchivesModel::ArchivesModel(QObject *parent)
 	: QStandardItemModel(parent)
+	, m_watcher(new QFileSystemWatcher(this))
 {
+	connect(m_watcher, SIGNAL(directoryChanged(QString)), SLOT(refresh()));
 }
 
 ArchivesModel::~ArchivesModel()
@@ -34,7 +37,9 @@ ArchivesModel::~ArchivesModel()
 
 void ArchivesModel::setArchivesRoot(const QString &archivesRoot)
 {
+	m_watcher->removePath(m_archivesRoot);
 	m_archivesRoot = archivesRoot;
+	m_watcher->addPath(m_archivesRoot);
 	refresh();
 }
 
@@ -61,7 +66,7 @@ void ArchivesModel::refresh()
 	const QFileInfo rootInfo(m_archivesRoot);
 	if(!rootInfo.isDir()) return;
 	
-	foreach(const QFileInfo &info, rootInfo.dir().entryInfoList()) {
+	foreach(const QFileInfo &info, rootInfo.dir().entryInfoList(QDir::Files)) {
 		appendRow(new ArchiveItem(info.absoluteFilePath()));
 	}
 }

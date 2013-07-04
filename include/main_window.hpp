@@ -19,6 +19,7 @@ class QProcess;
 class QFileSystemModel;
 class Heartbeat;
 class ServerThread;
+class ArchivesModel;
 
 class MainWindow : public QMainWindow
 {
@@ -41,6 +42,10 @@ private slots:
 	void processStarted();
 	void processFinished();
 	void terminateProcess();
+	
+	void on_run_clicked();
+	void on_remove_clicked();
+	void currentChanged(const QModelIndex index);
 	
 private:
 	void killProcess();
@@ -68,6 +73,7 @@ private:
 	
 	Heartbeat *m_heartbeat;
 	ServerThread *m_server;
+	ArchivesModel *m_archivesModel;
 };
 
 #endif

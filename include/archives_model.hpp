@@ -4,6 +4,8 @@
 #include <QStandardItemModel>
 #include <QString>
 
+class QFileSystemWatcher;
+
 class ArchivesModel : public QStandardItemModel
 {
 Q_OBJECT
@@ -18,10 +20,13 @@ public:
 	QString path(const QModelIndex index) const;
 	QString name(const QModelIndex index) const;
 	
-private:
+private Q_SLOTS:
 	void refresh();
 	
+private:
+	
 	QString m_archivesRoot;
+	QFileSystemWatcher *m_watcher;
 };
 
 #endif

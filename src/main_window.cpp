@@ -13,6 +13,7 @@
 #include "heartbeat.hpp"
 #include "server_thread.hpp"
 #include "vision_dialog.hpp"
+#include "archives_model.hpp"
 
 #include <QPrintDialog>
 #include <QFileDialog>
@@ -31,7 +32,8 @@ MainWindow::MainWindow(QWidget *parent)
 	m_process(0),
 	ui(new Ui::MainWindow),
 	m_heartbeat(new Heartbeat(this)),
-	m_server(0)
+	m_server(0),
+	m_archivesModel(new ArchivesModel(this))
 {
 	ui->setupUi(this);
 	setWindowTitle(QUserInfo::username() + "'s Computer");
@@ -45,6 +47,12 @@ MainWindow::MainWindow(QWidget *parent)
 	connect(ui->actionOpenWorkingDirectory, SIGNAL(activated()), SLOT(openWorkingDir()));
 	connect(ui->actionVision, SIGNAL(activated()), SLOT(vision()));
 	connect(ui->console, SIGNAL(abortRequested()), this, SLOT(terminateProcess()));
+	
+	ui->programs->setModel(m_archivesModel);
+	
+	connect(ui->programs->selectionModel(),
+		SIGNAL(currentChanged(QModelIndex, QModelIndex)),
+		SLOT(currentChanged(QModelIndex)));
 	
 	TcpServer *serial = new TcpServer;
 	serial->bind(KOVAN_SERIAL_PORT);
@@ -203,6 +211,31 @@ void MainWindow::terminateProcess()
 	m_process = 0;
 }
 
+void MainWindow::on_run_clicked()
+{
+	const QModelIndexList indexes = ui->programs->selectionModel()->selectedIndexes();
+	if(indexes.size() != 1) return;
+	QModelIndex index = indexes[0];
+	
+	run(m_archivesModel->name(index));
+}
+
+void MainWindow::on_remove_clicked()
+{
+	const QModelIndexList indexes = ui->programs->selectionModel()->selectedIndexes();
+	if(indexes.size() != 1) return;
+	QModelIndex index = indexes[0];
+	QFile::remove(m_archivesModel->path(index));
+	currentChanged(QModelIndex());
+}
+
+void MainWindow::currentChanged(const QModelIndex index)
+{
+	const bool e = index.isValid();
+	ui->run->setEnabled(e);
+	ui->remove->setEnabled(e);
+}
+
 void MainWindow::killProcess()
 {
 	if(!m_process) return;
@@ -253,6 +286,8 @@ void MainWindow::updateSettings()
 	prog.makeAbsolute();
 	if(!prog.exists()) QDir().mkpath(prog.absolutePath());
 	m_server->setUserRoot(prog.path());
+	
+	m_archivesModel->setArchivesRoot(prog.absoluteFilePath("archives") + "/");
 	
 	settings.endGroup();
 }
