@@ -22,7 +22,7 @@ SET(computer_SRCS_CXX ${SOURCES})
 SET(computer_UI ${UIS})
 SET(computer_MOC_SRCS ${INCLUDES})
 
-SET(computer_QRC_FILES ${RC}/icons.qrc)
+SET(computer_QRC_FILES ${RC}/icons.qrc ${RC}/target.qrc)
 
 QT4_WRAP_CPP(computer_SRCS_CXX ${computer_MOC_SRCS})
 QT4_WRAP_UI(computer_SRCS_CXX ${computer_UI})
@@ -68,10 +68,10 @@ macro(copy_files NAME FILES DESTINATION)
 endmacro(copy_files)
 
 IF(APPLE)
-	copy_files(target ${RC}/target.h ${computer_SOURCE_DIR}/deploy/computer.app/Contents/prefix/usr/include)
+	copy_files(target ${RC}/target.c ${computer_SOURCE_DIR}/deploy/computer.app/Contents/prefix/usr/include)
 	copy_files(platform.hints ${RC}/platform.hints ${computer_SOURCE_DIR}/deploy/computer.app/Contents)
 ELSE(APPLE)
-	copy_files(target ${RC}/target.h ${computer_SOURCE_DIR}/deploy/prefix/usr/include)
+	copy_files(target ${RC}/target.c ${computer_SOURCE_DIR}/deploy/prefix/usr/include)
 	copy_files(platform.hints ${RC}/platform.hints ${computer_SOURCE_DIR}/deploy)
 ENDIF(APPLE)
 
