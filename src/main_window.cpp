@@ -156,17 +156,19 @@ void MainWindow::run(const QString &executable)
 #endif
 	env.insert("CAMERA_BASE_CONFIG_PATH", m_workingDirectory.filePath("vision"));
 	
-	
 	Compiler::RootManager root(m_server->userRoot());
 #ifdef Q_OS_MAC
 	env.insert("DYLD_LIBRARY_PATH", env.value("DYLD_LIBRARY_PATH") + ":"
 		+ root.libDirectoryPaths().join(":"));
 #elif defined(Q_OS_WIN)
-	env.inser
+	env.insert("PATH", env.value("PATH") + ";" + QDir::currentPath().replace("/", "\\"));
+	env.insert("PATH", env.value("PATH") + ";" + root.libDirectoryPaths().join(";").replace("/", "\\"));
+	// QMessageBox::information(this, "test", env.value("PATH"));
 #else
 	env.insert("LD_LIBRARY_PATH", env.value("LD_LIBRARY_PATH") + ":"
 		+ root.libDirectoryPaths().join(":"));
 #endif
+
 	m_process->setProcessEnvironment(env);
 	m_process->setWorkingDirectory(m_workingDirectory.path());
 	ui->console->setProcess(m_process);
@@ -179,8 +181,6 @@ void MainWindow::run(const QString &executable)
 		ui->console->append(tr("Failed to start %1").arg(executable));
 		return;
 	}
-	
-	
 	
 	processStarted();
 	raise();
@@ -261,7 +261,7 @@ void MainWindow::updateSettings()
 	
 	QPalette pal = ui->console->palette();
 	pal.setColor(QPalette::Base, consoleColor);
-	ui->console->setPalette(pal);
+	// ui->console->setPalette(pal);
 	
 	QString contents = ui->console->toPlainText();
 	ui->console->clear();
