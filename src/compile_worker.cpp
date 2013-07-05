@@ -105,6 +105,7 @@ Compiler::OutputList CompileWorker::compile()
 	Options opts = Options::load(QDir::current().filePath("platform.hints"));
 	opts.setVariable("${PREFIX}", QDir::current().filePath("prefix"));
 	opts.setVariable("${USER_ROOT}", m_userRoot);
+	opts.expand();
 	
 	return engine.compile(Input::fromList(extracted), opts, this);
 }
