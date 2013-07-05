@@ -159,6 +159,15 @@ void ServerThread::handleAction(const Packet &action)
 		const QString archivePath = m_userRoot + "/archives/" + name;
 		const Kiss::KarPtr archive = Kiss::Kar::load(archivePath);
 		
+		QFile file(":/target.c");
+		if(!file.open(QIODevice::ReadOnly)) {
+			qWarning() << "Failed to inject target.c";
+		} else {
+			archive->setFile("__internal_target___.c", file.readAll());
+			file.close();
+		}
+		
+		
 		OutputList output;
 		CompileWorker *worker = 0;
 		if(!archive.isNull()) {
