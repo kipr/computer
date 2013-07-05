@@ -29,8 +29,10 @@ QT4_WRAP_UI(computer_SRCS_CXX ${computer_UI})
 QT4_ADD_RESOURCES(computer_SRCS_CXX ${computer_QRC_FILES})
 
 IF(WIN32)
-INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/../prefix/include)
-LINK_DIRECTORIES(${CMAKE_SOURCE_DIR}/../prefix/lib)
+	INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/../prefix/include)
+	LINK_DIRECTORIES(${CMAKE_SOURCE_DIR}/../prefix/lib)
+	INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/../opencv/kiss-prefix/include)
+	LINK_DIRECTORIES(${CMAKE_SOURCE_DIR}/../opencv/kiss-prefix/lib)
 ENDIF(WIN32)
 
 SET(CMAKE_CXX_FLAGS "-Wall")
@@ -50,7 +52,13 @@ ENDIF()
 
 SET(EXECUTABLE_OUTPUT_PATH ${computer_SOURCE_DIR}/deploy)
 SET(LIBRARY_OUTPUT_PATH ${computer_SOURCE_DIR}/lib)
-TARGET_LINK_LIBRARIES(computer ${QT_LIBRARIES} pcompiler kovanserial kar kovan opencv_core opencv_imgproc)
+TARGET_LINK_LIBRARIES(computer ${QT_LIBRARIES} pcompiler kovanserial kar kovan )
+
+IF(NOT WIN32)
+	TARGET_LINK_LIBRARIES(computer opencv_core opencv_imgproc)
+ELSE(NOT WIN32)
+	TARGET_LINK_LIBRARIES(computer opencv_core249 opencv_imgproc249)
+ENDIF(NOT WIN32)
 
 macro(copy_files NAME FILES DESTINATION)
   add_custom_target(copy_${NAME} ALL
@@ -75,7 +83,6 @@ ELSE(APPLE)
 	copy_files(platform.hints ${RC}/platform.hints ${computer_SOURCE_DIR}/deploy)
 ENDIF(APPLE)
 
-
 IF(APPLE)
 	ADD_CUSTOM_TARGET(computer_MacDeployQt ALL 
 		COMMAND ${QT_BINARY_DIR}/macdeployqt ${computer_SOURCE_DIR}/deploy/computer.app -verbose=0
@@ -91,4 +98,4 @@ IF(APPLE)
 		COMMAND ${CMAKE_COMMAND} -E copy ${RC}/mac_icon.icns ${computer_SOURCE_DIR}/deploy/computer.app/Contents/Resources
 		WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
 		DEPENDS computer Info.plist computer_MacDeployQt)
-ENDIF()
+ENDIF(APPLE)

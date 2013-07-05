@@ -16,6 +16,10 @@
 #include <pcompiler/pcompiler.hpp>
 #include <QDir>
 
+#ifdef Q_OS_WIN
+#include <windows.h>
+#endif
+
 ServerThread::ServerThread(TcpServer *server)
 	: m_stop(false),
 	m_server(server),
@@ -40,7 +44,11 @@ void ServerThread::run()
 {
 	Packet p;
 	while(!m_stop) {
+		#ifdef Q_OS_WIN
+		Sleep(1000);
+		#else
 		sleep(1);
+		#endif
 		QThread::yieldCurrentThread();
 		if(!m_server->accept(3)) continue;
 		for(;;) {
