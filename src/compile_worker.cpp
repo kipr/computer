@@ -116,11 +116,11 @@ Compiler::OutputList CompileWorker::compile()
 		
 		const Output::TerminalType type = out.terminal();
 		if(type == Output::BinaryTerminal) {
-			ret << Output(out.generatedFiles()[0], 0, "note: successfully generated executable",
-				QByteArray());
+			/*ret << Output(out.generatedFiles()[0], 0, "note: successfully generated executable",
+				QByteArray());*/
 		} else if(type == Output::LibraryTerminal) {
-			ret << Output(out.generatedFiles()[0], 0, "note: successfully generated library",
-				QByteArray());
+			/*ret << Output(out.generatedFiles()[0], 0, "note: successfully generated library",
+				QByteArray());*/
 		}
 	}
 	
