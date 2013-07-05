@@ -106,32 +106,7 @@ Compiler::OutputList CompileWorker::compile()
 	opts.setVariable("${PREFIX}", QDir::current().filePath("prefix"));
 	opts.setVariable("${USER_ROOT}", m_userRoot);
 	
-	OutputList ret = engine.compile(Input::fromList(extracted), opts, this);
-
-	// Pick out successful terminals
-	OutputList terminals;
-	foreach(const Output &out, ret) {
-		if(!out.isTerminal() || !out.isSuccess() || out.generatedFiles().isEmpty()) continue;
-		terminals << out;
-		
-		const Output::TerminalType type = out.terminal();
-		if(type == Output::BinaryTerminal) {
-			/*ret << Output(out.generatedFiles()[0], 0, "note: successfully generated executable",
-				QByteArray());*/
-		} else if(type == Output::LibraryTerminal) {
-			/*ret << Output(out.generatedFiles()[0], 0, "note: successfully generated library",
-				QByteArray());*/
-		}
-	}
-	
-	if(terminals.isEmpty()) return ret;
-	
-	// Copy terminal files to the appropriate directories
-	// ret << RootManager::install(terminals, m_userRoot, m_name);
-
-	return ret;
-
-
+	return engine.compile(Input::fromList(extracted), opts, this);
 }
 
 QString CompileWorker::tempPath()
