@@ -35,7 +35,7 @@ if(WIN32)
 	link_directories(${CMAKE_SOURCE_DIR}/../opencv/kiss-prefix/lib)
 endif()
 
-set(CMAKE_CXX_FLAGS "-Wall")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
 add_definitions(-O3)
 
 if(APPLE)
