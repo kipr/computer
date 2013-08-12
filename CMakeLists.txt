@@ -30,8 +30,8 @@ qt4_add_resources(computer_SRCS_CXX ${computer_QRC_FILES})
 
 if(WIN32)
 	include_directories(${CMAKE_SOURCE_DIR}/../prefix/include)
-	link_directories(${CMAKE_SOURCE_DIR}/../prefix/lib)
 	include_directories(${CMAKE_SOURCE_DIR}/../opencv/kiss-prefix/include)
+	link_directories(${CMAKE_SOURCE_DIR}/../prefix/lib)
 	link_directories(${CMAKE_SOURCE_DIR}/../opencv/kiss-prefix/lib)
 endif()
 
@@ -52,12 +52,12 @@ endif()
 
 set(EXECUTABLE_OUTPUT_PATH ${computer_SOURCE_DIR}/deploy)
 set(LIBRARY_OUTPUT_PATH ${computer_SOURCE_DIR}/lib)
-target_link_libraries(computer ${QT_LIBRARIES} pcompiler kovanserial kar kovan )
+target_link_libraries(computer ${QT_LIBRARIES} pcompiler kovanserial kar kovan)
 
-if(NOT WIN32)
-	target_link_libraries(computer opencv_core opencv_imgproc)
-else()
+if(WIN32)
 	target_link_libraries(computer opencv_core249 opencv_imgproc249)
+else()
+	target_link_libraries(computer opencv_core opencv_imgproc)
 endif()
 
 macro(copy_files NAME FILES DESTINATION)
