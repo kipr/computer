@@ -47,7 +47,6 @@ elseif(UNIX)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
 	add_executable(computer ${computer_SRCS_CXX})
 elseif(WIN32)
-	set(CMAKE_CXX_FLAGS "-Wl,--enable-auto-import")
 	add_executable(computer WIN32 ${computer_SRCS_CXX})
 endif()
 
