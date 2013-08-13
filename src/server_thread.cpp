@@ -129,7 +129,7 @@ void ServerThread::handleArchive(const Packet &headerPacket)
 	qDebug() << "Took" << (end - start) << "milliseconds to recv";
 	
 	// Load up the archive
-	Kiss::Kar *archive = new Kiss::Kar();
+	kiss::Kar *archive = new kiss::Kar();
 	std::string data = file.str();
 	QByteArray arr(data.c_str(), data.size());
 	QDataStream stream(arr);
@@ -157,7 +157,7 @@ void ServerThread::handleAction(const Packet &action)
 
 	if(type == COMMAND_ACTION_COMPILE) {
 		const QString archivePath = m_userRoot + "/archives/" + name;
-		const Kiss::KarPtr archive = Kiss::Kar::load(archivePath);
+		const kiss::KarPtr archive = kiss::Kar::load(archivePath);
 		
 		QFile file(":/target.c");
 		if(!file.open(QIODevice::ReadOnly)) {

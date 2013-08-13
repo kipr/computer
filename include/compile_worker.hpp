@@ -3,7 +3,7 @@
 
 #include <QThread>
 
-#include <kar.hpp>
+#include <kar/kar.hpp>
 #include <pcompiler/output.hpp>
 #include <pcompiler/progress.hpp>
 
@@ -13,7 +13,7 @@ class CompileWorker : public QThread, public Compiler::Progress
 {
 Q_OBJECT
 public:
-	CompileWorker(const Kiss::KarPtr &archive, KovanSerial *proto, QObject *parent = 0);
+	CompileWorker(const kiss::KarPtr &archive, KovanSerial *proto, QObject *parent = 0);
 	
 	void run();
 	
@@ -30,7 +30,7 @@ private:
 	Compiler::OutputList compile();
 	static QString tempPath();
 	
-	Kiss::KarPtr m_archive;
+	kiss::KarPtr m_archive;
 	KovanSerial *m_proto;
 	Compiler::OutputList m_output;
 	QString m_userRoot;

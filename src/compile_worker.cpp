@@ -44,7 +44,7 @@ private:
 	QString path;
 };
 
-CompileWorker::CompileWorker(const Kiss::KarPtr &archive, KovanSerial *proto, QObject *parent)
+CompileWorker::CompileWorker(const kiss::KarPtr &archive, KovanSerial *proto, QObject *parent)
 	: QThread(parent),
 	m_archive(archive),
 	m_proto(proto)
@@ -87,7 +87,7 @@ void CompileWorker::progress(double fraction)
 Compiler::OutputList CompileWorker::compile()
 {
 	using namespace Compiler;
-	using namespace Kiss;
+	using namespace kiss;
 
 	// Extract the archive to a temporary directory
 	m_tempDir = tempPath();

@@ -5,7 +5,7 @@
 #include <QString>
 #include <QRunnable>
 
-#include <kar.hpp>
+#include <kar/kar.hpp>
 #include <kovanserial/transport_layer.hpp>
 
 class TcpServer;
