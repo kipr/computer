@@ -29,10 +29,12 @@ qt4_wrap_ui(computer_SRCS_CXX ${computer_UI})
 qt4_add_resources(computer_SRCS_CXX ${computer_QRC_FILES})
 
 if(WIN32)
+	set(OPENCV_INSTALL_DIR ${CMAKE_SOURCE_DIR}/../opencv/build)
+
 	include_directories(${CMAKE_SOURCE_DIR}/../prefix/include)
-	include_directories(${CMAKE_SOURCE_DIR}/../opencv/kiss-prefix/include)
+	include_directories(${OPENCV_INSTALL_DIR}/include)
 	link_directories(${CMAKE_SOURCE_DIR}/../prefix/lib)
-	link_directories(${CMAKE_SOURCE_DIR}/../opencv/kiss-prefix/lib)
+	link_directories(${OPENCV_INSTALL_DIR}/x86/vc11/lib)
 endif()
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
@@ -55,7 +57,7 @@ set(LIBRARY_OUTPUT_PATH ${computer_SOURCE_DIR}/lib)
 target_link_libraries(computer ${QT_LIBRARIES} pcompiler kovanserial kar kovan)
 
 if(WIN32)
-	target_link_libraries(computer opencv_core249 opencv_imgproc249)
+	target_link_libraries(computer opencv_core246 opencv_imgproc246)
 else()
 	target_link_libraries(computer opencv_core opencv_imgproc)
 endif()
