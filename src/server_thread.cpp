@@ -126,6 +126,7 @@ void ServerThread::handleArchive(const Packet &headerPacket)
 	}
 	
 	quint64 end = msystime();
+	qDebug() << "Header size: " << header.size;
 	qDebug() << "Took" << (end - start) << "milliseconds to recv";
 	
 	// Load up the archive
@@ -193,7 +194,7 @@ void ServerThread::handleAction(const Packet &action)
 		
 		std::istringstream sstream;
 		sstream.rdbuf()->pubsetbuf(data.data(), data.size());
-		if(!m_proto->sendFile("", "col", &sstream)) {
+		if(!m_proto->sendFile("", "col", (unsigned char *)data.data(), data.size())) {
 			qWarning() << "Sending result failed";
 			return;
 		}
