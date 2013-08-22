@@ -223,25 +223,28 @@ void VisionDialog::on_down_clicked()
 
 void VisionDialog::updateOptions(const QItemSelection &current, const QItemSelection &prev)
 {
-	if(prev.indexes().size()) {
-		QModelIndex p = prev.indexes()[0];
-		Config c = m_configModel->config();
-		c.beginGroup(CAMERA_GROUP);
-		c.beginGroup(CAMERA_CHANNEL_GROUP_PREFIX + QString::number(p.row()).toStdString());
-		c.addValues(m_hsvConfig);
-		m_configModel->setConfig(c);
-		ui->channels->selectionModel()->select(current, QItemSelectionModel::Select);
-	}
-	
-	const QModelIndexList &indexes = current.indexes();
-	const bool enable = ui->channels->isEnabled();
-	const bool sel = indexes.size() == 1 && enable;
-	ui->addChannel->setEnabled(enable);
-	ui->removeChannel->setEnabled(sel);
-	ui->up->setEnabled(sel && indexes[0].row() > 0);
-	ui->down->setEnabled(sel && indexes[0].row() + 1 < m_configModel->rowCount());
-	ui->hsv->setEnabled(sel);
-	
+    if(prev.indexes().size()) {
+        QModelIndex p = prev.indexes()[0];
+        Config c = m_configModel->config();
+        c.beginGroup(CAMERA_GROUP);
+        c.beginGroup(CAMERA_CHANNEL_GROUP_PREFIX + QString::number(p.row()).toStdString());
+        c.addValues(m_hsvConfig);
+        const int row = current.indexes().size() == 1 ? current.indexes()[0].row() : -1;
+        m_configModel->setConfig(c);
+        if(row >= 0) {
+            ui->channels->selectionModel()->select(m_configModel->index(row, 0), QItemSelectionModel::Select);
+        }
+    }
+    
+    const QModelIndexList &indexes = current.indexes();
+    const bool enable = ui->channels->isEnabled();
+    const bool sel = indexes.size() == 1 && enable;
+    ui->addChannel->setEnabled(enable);
+    ui->removeChannel->setEnabled(sel);
+    ui->up->setEnabled(sel && indexes[0].row() > 0);
+    ui->down->setEnabled(sel && indexes[0].row() + 1 < m_configModel->rowCount());
+    ui->hsv->setEnabled(sel);
+    
 	if(indexes.size()) {
 		Config c = m_configModel->config();
 		c.beginGroup(CAMERA_GROUP);

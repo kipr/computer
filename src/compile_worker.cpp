@@ -117,7 +117,5 @@ QString CompileWorker::tempPath()
 
 void CompileWorker::cleanup()
 {
-
-	// QMessageBox::information(0, "", m_tempDir);
 	Cleaner c(m_tempDir);
 }

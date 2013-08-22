@@ -261,7 +261,6 @@ void MainWindow::updateSettings()
 	
 	QPalette pal = ui->console->palette();
 	pal.setColor(QPalette::Base, consoleColor);
-	// ui->console->setPalette(pal);
 	
 	QString contents = ui->console->toPlainText();
 	ui->console->clear();

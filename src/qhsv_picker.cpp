@@ -59,7 +59,6 @@ void QHsvPicker::paintEvent(QPaintEvent *)
 	QPainter painter(this);
 	
 	const float widthRatio = width() / 360.0f;
-	//unused: const float heightRatio = height() / 255.0f;
 	
 	const bool enabled = isEnabled();
 	
