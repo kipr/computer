@@ -8,7 +8,8 @@ Requirements
 
 * Qt 4.7 or higher
 * CMake 2.8.0 or higher
-* easydevice
+* OpenCV 2.4.6 or higher
+* libkovanserial
 * pcompiler
 * libkar
 
