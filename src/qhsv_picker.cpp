@@ -197,13 +197,6 @@ void QHsvPicker::slide()
 		newCenterH = m_min.hue() + (360 - m_min.hue() + m_max.hue()) / 2;
 	}
 	
-	// qDebug() << "new center:" << newCenterH;
-	/* QPropertyAnimation *anim = new QPropertyAnimation(this, "centerHue", this);
-	anim->setDuration(500);
-	anim->setStartValue(360 + m_centerHue);
-	anim->setEndValue(360 + newCenterH);
-	anim->setEasingCurve(QEasingCurve::InOutCubic);
-	anim->start(); */
 	setCenterHue(newCenterH);
 }
 
