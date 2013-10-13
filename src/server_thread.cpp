@@ -44,11 +44,11 @@ void ServerThread::run()
 {
 	Packet p;
 	while(!m_stop) {
-		#ifdef Q_OS_WIN
+#ifdef Q_OS_WIN
 		Sleep(1000);
-		#else
+#else
 		sleep(1);
-		#endif
+#endif
 		QThread::yieldCurrentThread();
 		if(!m_server->accept(3)) continue;
 		for(;;) {

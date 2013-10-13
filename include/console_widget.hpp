@@ -25,12 +25,8 @@ private slots:
 	void readStandardErr();
 
 private:
-	int inputCharCount;
-	QTextCursor curCursorLoc;
-	QString cmdStr;
-	QStringList cmdHistory;
-	int histLocation;
-	QString tempCmd;
+  QString _current;
+  int _offset;
 	QProcess *m_process;
 };
 

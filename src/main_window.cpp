@@ -265,8 +265,8 @@ void MainWindow::updateSettings()
 	QString contents = ui->console->toPlainText();
 	ui->console->clear();
 	ui->console->setTextColor(textColor);
-	ui->console->setCurrentFont(font);
-	ui->console->setFontPointSize(fontSize);
+  font.setPointSize(fontSize);
+	ui->console->setFont(font);
 	ui->console->setPlainText(contents);
 	
 	settings.beginGroup(STORAGE);
