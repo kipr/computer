@@ -306,7 +306,8 @@ void MainWindow::updateAdvert()
 	Advert ad(tr("N/A").toAscii(),
 		version.toAscii(),
 		tr("computer").toAscii(),
-		displayName().toAscii());
+		displayName().toAscii(),
+		KOVAN_SERIAL_PORT);
 	m_heartbeat->setAdvert(ad);
 }
 
