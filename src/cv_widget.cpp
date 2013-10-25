@@ -37,7 +37,7 @@ void CvWidget::updateImage(const cv::Mat &image)
 		return;
 	}
 	
-	cv::cvtColor(image, m_image, CV_BGR2RGB);
+	cv::cvtColor(image, m_image, cv::COLOR_BGR2RGB);
 	scaleImage();
 	update();
 	m_mutex.unlock();
