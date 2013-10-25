@@ -12,6 +12,7 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <unistd.h>
 
 #include <pcompiler/pcompiler.hpp>
 #include <QDir>
