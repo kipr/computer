@@ -36,6 +36,7 @@ QProcess *ConsoleWidget::process() const
 
 void ConsoleWidget::keyPressEvent(QKeyEvent *event)
 {
+  if(!m_process) return;
   QTextEdit::keyPressEvent(event);
   if(event->modifiers() != Qt::NoModifier && event->modifiers() != Qt::ShiftModifier) return;
   QString text = event->text();
