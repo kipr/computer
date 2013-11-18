@@ -293,6 +293,7 @@ void MainWindow::updateSettings()
 
 void MainWindow::updateAdvert()
 {
+  if(!m_heartbeat) return;
 	QString version = (QString::number(COMPUTER_VERSION_MAJOR) + "."
 		+ QString::number(COMPUTER_VERSION_MINOR));
 	#if defined(Q_OS_WIN)
