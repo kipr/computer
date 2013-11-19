@@ -12,7 +12,10 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+
+#ifndef WIN32
 #include <unistd.h>
+#endif
 
 #include <pcompiler/pcompiler.hpp>
 #include <QDir>
