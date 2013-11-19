@@ -29,7 +29,7 @@ qt4_wrap_ui(computer_SRCS_CXX ${computer_UI})
 qt4_add_resources(computer_SRCS_CXX ${computer_QRC_FILES})
 
 if(WIN32)
-	set(OPENCV_INSTALL_DIR ${CMAKE_SOURCE_DIR}/../opencv/build)
+	set(OPENCV_INSTALL_DIR ${CMAKE_SOURCE_DIR}/../opencv/build/install)
 
 	include_directories(${CMAKE_SOURCE_DIR}/../prefix/include)
 	include_directories(${OPENCV_INSTALL_DIR}/include)
@@ -57,7 +57,7 @@ set(LIBRARY_OUTPUT_PATH ${computer_SOURCE_DIR}/lib)
 target_link_libraries(computer ${QT_LIBRARIES} pcompiler kovanserial kar kovan)
 
 if(WIN32)
-	target_link_libraries(computer opencv_core246 opencv_imgproc246)
+	target_link_libraries(computer opencv_core300 opencv_imgproc300)
 else()
 	target_link_libraries(computer opencv_core opencv_imgproc)
 endif()
