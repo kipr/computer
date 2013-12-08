@@ -1,8 +1,9 @@
 project(computer)
 
-cmake_minimum_required(VERSION 2.8.0)
+cmake_minimum_required(VERSION 2.8.12)
 
-find_package(Qt4 REQUIRED)
+find_package(Qt5Widgets REQUIRED)
+find_package(Qt5PrintSupport REQUIRED)
 
 set(INCLUDE ${computer_SOURCE_DIR}/include)
 set(RC ${computer_SOURCE_DIR}/rc)
@@ -11,8 +12,6 @@ set(UI ${computer_SOURCE_DIR}/ui)
 
 include_directories(${computer_BINARY_DIR})
 include_directories(${INCLUDE})
-
-include(${QT_USE_FILE})
 
 file(GLOB INCLUDES ${INCLUDE}/*.hpp)
 file(GLOB SOURCES ${SRC}/*)
@@ -24,9 +23,9 @@ set(computer_MOC_SRCS ${INCLUDES})
 
 set(computer_QRC_FILES ${RC}/icons.qrc ${RC}/target.qrc)
 
-qt4_wrap_cpp(computer_SRCS_CXX ${computer_MOC_SRCS})
-qt4_wrap_ui(computer_SRCS_CXX ${computer_UI})
-qt4_add_resources(computer_SRCS_CXX ${computer_QRC_FILES})
+qt5_wrap_cpp(computer_SRCS_CXX ${computer_MOC_SRCS})
+qt5_wrap_ui(computer_SRCS_CXX ${computer_UI})
+qt5_add_resources(computer_SRCS_CXX ${computer_QRC_FILES})
 
 if(WIN32)
 	set(OPENCV_INSTALL_DIR ${CMAKE_SOURCE_DIR}/../opencv/build/install)
@@ -54,7 +53,8 @@ endif()
 
 set(EXECUTABLE_OUTPUT_PATH ${computer_SOURCE_DIR}/deploy)
 set(LIBRARY_OUTPUT_PATH ${computer_SOURCE_DIR}/lib)
-target_link_libraries(computer ${QT_LIBRARIES} pcompiler kovanserial kar kovan)
+qt5_use_modules(computer Widgets PrintSupport)
+target_link_libraries(computer pcompiler kovanserial kar kovan)
 
 if(WIN32)
 	target_link_libraries(computer opencv_core300 opencv_imgproc300)
@@ -87,7 +87,7 @@ endif()
 
 if(APPLE)
 	add_custom_target(computer_MacDeployQt ALL 
-		COMMAND ${QT_BINARY_DIR}/macdeployqt ${computer_SOURCE_DIR}/deploy/computer.app -verbose=0
+		COMMAND ${_qt5Core_install_prefix}/bin/macdeployqt ${computer_SOURCE_DIR}/deploy/computer.app -verbose=0
 		WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
 		DEPENDS computer)
 	

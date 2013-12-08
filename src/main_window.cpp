@@ -38,14 +38,14 @@ MainWindow::MainWindow(QWidget *parent)
 	ui->setupUi(this);
 	setWindowTitle(QUserInfo::username() + "'s Computer");
 	
-	connect(ui->actionPrint, SIGNAL(activated()), SLOT(print()));
-	connect(ui->actionSave, SIGNAL(activated()), SLOT(saveToFile()));
-	connect(ui->actionCopy, SIGNAL(activated()), SLOT(copy()));
-	connect(ui->actionStop, SIGNAL(activated()), SLOT(terminateProcess()));
-	connect(ui->actionAbout, SIGNAL(activated()), SLOT(about()));
-	connect(ui->actionSettings, SIGNAL(activated()), SLOT(settings()));
-	connect(ui->actionOpenWorkingDirectory, SIGNAL(activated()), SLOT(openWorkingDir()));
-	connect(ui->actionVision, SIGNAL(activated()), SLOT(vision()));
+	connect(ui->actionPrint, SIGNAL(triggered()), SLOT(print()));
+	connect(ui->actionSave, SIGNAL(triggered()), SLOT(saveToFile()));
+	connect(ui->actionCopy, SIGNAL(triggered()), SLOT(copy()));
+	connect(ui->actionStop, SIGNAL(triggered()), SLOT(terminateProcess()));
+	connect(ui->actionAbout, SIGNAL(triggered()), SLOT(about()));
+	connect(ui->actionSettings, SIGNAL(triggered()), SLOT(settings()));
+	connect(ui->actionOpenWorkingDirectory, SIGNAL(triggered()), SLOT(openWorkingDir()));
+	connect(ui->actionVision, SIGNAL(triggered()), SLOT(vision()));
 	connect(ui->console, SIGNAL(abortRequested()), this, SLOT(terminateProcess()));
 	
 	ui->programs->setModel(m_archivesModel);
@@ -304,10 +304,10 @@ void MainWindow::updateAdvert()
 	version += " for *nix";
 	#endif
 	
-	Advert ad(tr("N/A").toAscii(),
-		version.toAscii(),
-		tr("computer").toAscii(),
-		displayName().toAscii(),
+	Advert ad(tr("N/A").toUtf8(),
+		version.toUtf8(),
+		tr("computer").toUtf8(),
+		displayName().toUtf8(),
 		KOVAN_SERIAL_PORT);
 	m_heartbeat->setAdvert(ad);
 }

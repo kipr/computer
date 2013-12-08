@@ -21,9 +21,6 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
-    <property name="spacing">
-     <number>6</number>
-    </property>
     <property name="margin">
      <number>6</number>
     </property>
@@ -357,7 +354,7 @@
  <connections>
   <connection>
    <sender>actionZoom_Out</sender>
-   <signal>activated()</signal>
+   <signal>triggered()</signal>
    <receiver>console</receiver>
    <slot>zoomOut()</slot>
    <hints>
@@ -373,7 +370,7 @@
   </connection>
   <connection>
    <sender>actionZoom</sender>
-   <signal>activated()</signal>
+   <signal>triggered()</signal>
    <receiver>console</receiver>
    <slot>zoomIn()</slot>
    <hints>

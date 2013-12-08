@@ -43,7 +43,7 @@ void ConsoleWidget::keyPressEvent(QKeyEvent *event)
   // if(event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter) text = "\n";
   
   _current.insert(_current.size() + _offset, text);
-  m_process->write(_current.toAscii(), _current.length());
+  m_process->write(_current.toUtf8(), _current.length());
   _current = QString();
 }
 
